@@ -16,18 +16,17 @@
         >
           <template v-slot:activator="{ on }">
             <v-text-field
-              v-model="reservation.checkin"
+              v-model="checkinFormatted"
               label="Checkin"
               prepend-icon="event"
               readonly
               v-on="on"
             ></v-text-field>
           </template>
-          <v-date-picker v-model="reservation.checkin" no-title scrollable>
-            <v-spacer></v-spacer>
-            <v-btn flat color="primary" @click="checkinMenu = false">Cancel</v-btn>
-            <v-btn flat color="primary" @click="$refs.ciMenu.save(reservation.checkin)">OK</v-btn>
-          </v-date-picker>
+          <v-date-picker 
+            v-model="reservation.checkin" 
+            @input="ciInput"
+          />
         </v-menu>
       </v-flex>
       
@@ -46,18 +45,17 @@
         >
           <template v-slot:activator="{ on }">
             <v-text-field
-              v-model="reservation.checkout"
+              v-model="checkoutFormatted"
               label="Checkout"
               prepend-icon="event"
               readonly
               v-on="on"
             ></v-text-field>
           </template>
-          <v-date-picker v-model="reservation.checkout" no-title scrollable>
-            <v-spacer></v-spacer>
-            <v-btn flat color="primary" @click="checkoutMenu = false">Cancel</v-btn>
-            <v-btn flat color="primary" @click="$refs.coMenu.save(reservation.checkout)">OK</v-btn>
-          </v-date-picker>
+          <v-date-picker 
+            v-model="reservation.checkout" 
+            @input="coInput"
+            />
         </v-menu>
       </v-flex>
       <v-flex xs6 sm4>
@@ -77,10 +75,9 @@
                 <li v-for="item in selectGroups"
                   v-bind:key="item.title"
                 >
-                  {{ item.title }}
                   <v-select
                     :items="item.groups"
-                    label="Space"
+                    :label="item.title"
                     @change="spaceSelect"
                   >
                   </v-select>
@@ -136,12 +133,23 @@
 
 <script>
 import _ from 'lodash'
+import moment from 'moment'
 export default{
   components: {
     Customer: () => import('./../components/customer.vue')
   },
   computed:{
-     peopleSelect: {
+    checkinFormatted: {
+      get: function(){
+        return moment(this.reservation.checkin).format('MMM DD YYYY');
+      }
+    },
+    checkoutFormatted: {
+      get: function(){
+        return moment(this.reservation.checkout).format('MMM DD YYYY');
+      }
+    },
+    peopleSelect: {
       get: function(){
         return {
           text: this.reservation.people,
@@ -204,6 +212,14 @@ export default{
     }
   },
   methods: {
+    ciInput: function(val){
+      this.checkinMenu = false;
+      this.$refs.ciMenu.save(this.reservation.checkin);
+    },
+    coInput: function(val){
+      this.checkoutMenu = false;
+      this.$refs.coMenu.save(this.reservation.checkout);
+    },
     changeRoute: function(){
       console.log("changeRoute()");
     },
@@ -223,8 +239,12 @@ export default{
     spaceSelect: function(evt){
       //evt is the value from the the select
       //which is the space_id
-      //set the data
+      //set space_id
       this.reservation.space_id = evt;
+      //set space_code
+      this.reservation.space_code = this.$store.getters.getSpaces[evt].space_code;
+      //close the modal
+      this.spaceDialog = false;
     }
   },
 
