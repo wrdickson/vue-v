@@ -8,13 +8,33 @@ export default new Vuex.Store({
   //remove this for production
   strict: true,
   state: {
+    createReservation: {
+      checkin: '0001-01-01',
+      checkout: '0001-01-02',
+      customer: {
+        firstName: "not loaded",
+        lastName: "not loaded",
+        id: '0'
+      },
+      people: '0',
+      beds: '0',
+      folio: '0',
+      history: [],
+      notes: [],
+      space_code: '0',
+      space_id: '0',
+      space_type: '0',
+      status: '0'
+    }, 
     reservations:[],
     selectedOriginalReservation: {
+      beds: '1',
       checkin: '2015-01-01',
       checkout: '2015-01-02',
       customer: {
-        firstName: 'noooo',
-        lastName: 'noper'
+        firstName: 'not loaded',
+        lastName: 'not loaded',
+        id: '0'
       }
     },
     selectGroups: {},
@@ -23,19 +43,41 @@ export default new Vuex.Store({
       checkout: '2015-01-02',
       customer: {
         firstName: "not loaded",
-        lastName: "not loaded"
+        lastName: "not loaded",
+        id: '0'
       },
-      people: '0'
+      people: '0',
+      beds: '0',
+      folio: '0',
+      history: [],
+      notes: [],
+      space_code: '0',
+      space_id: '0',
+      space_type: '0',
+      status: '0'
     },
     selectedCustomer: {
       id: 0,
       firstName: '',
       lastName: ''
     },
+    showLoader: false,
     spaces: {},
-    spaceTypes: {}
+    spaceTypes: {},
+    user: {
+      userId: 0,
+      username: "Guest",
+      permission: 0,
+      key: 1
+    }
   },
   getters: {
+    getCreateReservation: state=> {
+      return state.createReservation;
+    },
+    getLoaderShown: state => {
+      return state.showLoader;
+    },
     getReservations: state => {
       return state.reservations;
     },
@@ -56,10 +98,20 @@ export default new Vuex.Store({
     },
     getSpaceTypes: state => {
       return state.spaceTypes;
+    },
+    getUser: state => {
+      return state.user
     }
   },
   mutations: {
+    //loader
+    hideLoader: state => state.showLoader = false,
+    showLoader: state => state.showLoader = true,    
+    
     //reservations
+    setCreateReservation( state, createReservation ){
+      state.createReservation = createReservation;
+    },
     setReservations(state, reservations){
       state.reservations = reservations;
     },
@@ -80,6 +132,17 @@ export default new Vuex.Store({
     },
     setSpaceTypes( state, spaceTypes ){
       state.spaceTypes = spaceTypes;
+    },
+    setUser (state, user){
+      state.user = user
+    },
+    setUserToGuest(state){
+      state.user = {
+        userId: 0,
+        username: 'Guest',
+        permission: 0,
+        key: '0'
+      }
     }
   },
   actions: {
@@ -92,7 +155,6 @@ export default new Vuex.Store({
           context.commit('setReservations', response.data);
         });
     },
-    
     loadSelectedReservation(context, resId){
       //context.commit('showLoader');
       api.getReservation( resId ).then( response => {

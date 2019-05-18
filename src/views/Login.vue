@@ -1,50 +1,100 @@
 <template>
   <div>
-    <h3>Login</h3>
+    <v-layout >
+      <v-flex xs8 sm6 md4 lg3>
+        <v-card>  
+          <v-card-title primary-title> 
+            <h3 class="headline mb-0">Login</h3>
+          </v-card-title> 
+          <v-card-text>
+            <v-text-field
+              v-model="username1"
+              label="Username"
+            >
+            </v-text-field><br>
+            <v-text-field 
+              v-model="password1"
+              label="Password"
+              type='password'
+            >
+            </v-text-field><br>
+          </v-card-text>    
+          <v-card-actions>
+            <v-btn 
+              @click="loginCheck"
+              color="primary"
+              ripple
+            >
+              Login
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-flex>
+    </v-layout>
     
-    <v-menu
-      ref="menu"
-      v-model="menu"
-      :close-on-content-click="false"
-      :nudge-right="40"
-      :return-value.sync="date"
-      lazy
-      transition="scale-transition"
-      offset-y
-      full-width
-      min-width="290px"
-    >
-      <template v-slot:activator="{ on }">
-        <v-text-field
-          v-model="date"
-          label="Checkin"
-          prepend-icon="event"
-          readonly
-          v-on="on"
-        ></v-text-field>
-      </template>
-      <v-date-picker v-model="date" no-title scrollable>
-        <v-spacer></v-spacer>
-        <v-btn flat color="primary" @click="menu = false">Cancel</v-btn>
-        <v-btn flat color="primary" @click="$refs.menu.save(date)">OK</v-btn>
-      </v-date-picker>
-    </v-menu> 
-
-    <div> {{date}} </div>
-    
-    
+    <v-layout row>
+      <v-flex xs12> 
+        <hr>
+        <div>Username: {{ user.username }} </div>
+        <div>UserId: {{ user.userId }} </div>
+        <div>UserPerm: {{ user.permission }} </div>
+        <div>UserKey: {{ user.key }} </div>
+        <hr>
+      </v-flex>
+    </v-layout>
   </div>
 </template>
 
 <script>
+import api from './../api/api.js'
 export default{
+  computed: {
+    user: function(){
+      return this.$store.getters.getUser;
+    }
+  },
   data: function(){
     return {
-      picker: new Date().toISOString().substr(0, 10),
-      menu: false,
-      date: new Date().toISOString().substr(0, 10)
+      username1: '',
+      password1: ''
+    }
+  },
+  methods: {
+    loginCheck: function(){
+      this.$store.commit('showLoader');
+      api.login(this.username1, this.password1).then( ( response ) => {
+        this.$store.commit('hideLoader');
+        if(response.data.login.pass > 0){
+          //set session . . .
+          sessionStorage.setItem("username", response.data.login.username);
+          sessionStorage.setItem("userId", response.data.login.id);
+          sessionStorage.setItem("permission", response.data.login.permission);
+          sessionStorage.setItem("key", response.data.login.user_key);
+          //set the store
+          let obj = {
+            userId: response.data.login.id,
+            username: response.data.login.username,
+            permission: response.data.login.permission,
+            key: response.data.login.user_key
+          };
+          this.$store.commit('setUser', obj)
+        } else {
+          //set session . . .
+          sessionStorage.setItem("username", "Guest");
+          sessionStorage.setItem("userId", 0);
+          sessionStorage.setItem("permission", 0);
+          sessionStorage.setItem("key", 0);
+          this.$store.commit('setUserToGuest')
+        }
+        //either way, clear the inputs
+        this.username1 = '',
+        this.password1 = ''
+      });
     }
   }
 }
-
 </script>
+
+<style>
+
+</style>

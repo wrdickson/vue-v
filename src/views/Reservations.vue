@@ -1,7 +1,13 @@
 <template>
 <div>
-  <v-btn @click="returnToTimeline">Timeline</v-btn>
-  <T1 v-on:reservationSelected="fireReservationView" v-if="showTimeline" :groups="groups" :items="reservations1" :options="options"/>
+  <v-btn outline @click="returnToTimeline">Timeline</v-btn>
+  <T1 
+    v-on:reservationSelected="fireReservationView"
+    v-if="showTimeline" 
+    :groups="groups" 
+    :items="reservations1" 
+    :options="options"
+  />
   <Reservation 
     transition="slide-x-transition"
     v-if="showReservation"
@@ -18,7 +24,6 @@ export default {
   components:{
     T1: () => import('./../components/timeline1.vue'),
     Reservation: () => import('./../views/Reservation.vue')
-    
   },
   computed:{
     reservations1(){
@@ -174,7 +179,6 @@ export default {
       ],
       items: [],
       options: {
-        
         editable: false,
         maxHeight: '500px',
         orientation: 'both',
@@ -204,11 +208,17 @@ export default {
       this.showTimeline = true;
       this.showReservation = false;
     },
+    //the Timeline component $emits this when a user selects
+    //a reservation
     fireReservationView: function(resId){
       console.log("frie",resId);
       this.selectedReservationId = resId;
       this.showTimeline = false;
       this.showReservation = true;
+    },
+    toReservation: function(){
+      this.showTimeline = false;
+      this.showReservation = true;     
     }
   },
   mounted: function () {

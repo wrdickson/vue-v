@@ -25,9 +25,19 @@ export default new Router({
       component: () => import(/* webpackChunkName: "about" */ './views/About.vue')
     },
     {
+      path: '/createReservation/',
+      name: 'createReservation',
+      component: () => import(/* webpackChunkName: "CreateReservation" */ './views/CreateReservation.vue')
+    },
+    {
       path: '/login',
       name: 'login',
       component: Login
+    },
+    {
+      path: '/logoff',
+      name: 'logoff',
+      component: () => import(/* webpackChunkName: "Logoff" */ './views/Logoff.vue')
     },
     {
       path: '/reservation/:reservationid',
