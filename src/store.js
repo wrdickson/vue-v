@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import api from './api/api.js'
-
+import moment from 'moment'
 Vue.use(Vuex)
 
 export default new Vuex.Store({
@@ -25,8 +25,11 @@ export default new Vuex.Store({
       space_id: '0',
       space_type: '0',
       status: '0'
-    }, 
+    },
+    createReservationAvailableSpaces: [],
     reservations:[],
+    resViewStart: moment().format('YYYY-MM-DD'),
+    resViewEnd: moment().add(1,'month').format('YYYY-MM-DD'),
     selectedOriginalReservation: {
       beds: '1',
       checkin: '2015-01-01',
@@ -64,6 +67,7 @@ export default new Vuex.Store({
     showLoader: false,
     spaces: {},
     spaceTypes: {},
+    testVal: {a:'test'},
     user: {
       userId: 0,
       username: "Guest",
@@ -75,11 +79,20 @@ export default new Vuex.Store({
     getCreateReservation: state=> {
       return state.createReservation;
     },
+    getCreateReservationAvailableSpaces: state => {
+      return state.createReservationAvailableSpaces;
+    },
     getLoaderShown: state => {
       return state.showLoader;
     },
     getReservations: state => {
       return state.reservations;
+    },
+    getResViewEnd: state => {
+      return state.resViewEnd;
+    },
+    getResViewStart: state => {
+      return state.resViewStart;
     },
     getSelectedCustomer: state => {
       return state.selectedCustomer;
@@ -87,7 +100,7 @@ export default new Vuex.Store({
     getSelectedReservation: state => {
       return state.selectedReservation;
     },
-     getSelectedOriginalReservation: state => {
+    getSelectedOriginalReservation: state => {
       return state.selectedOriginalReservation;
     },
     getSelectGroups: state =>{
@@ -99,6 +112,9 @@ export default new Vuex.Store({
     getSpaceTypes: state => {
       return state.spaceTypes;
     },
+    getTestVal: state => {
+      return state.testVal;
+    },
     getUser: state => {
       return state.user
     }
@@ -108,9 +124,34 @@ export default new Vuex.Store({
     hideLoader: state => state.showLoader = false,
     showLoader: state => state.showLoader = true,    
     
-    //reservations
+    //reservations view
+    resViewMinusDay( state ){
+      state.resViewStart = moment(state.resViewStart).subtract(1,'day').format('YYYY-MM-DD');
+      state.resViewEnd = moment(state.resViewEnd).subtract(1,'day').format('YYYY-MM-DD');
+    },
+    resViewPlusDay( state ){
+      state.resViewStart = moment(state.resViewStart).add(1,'day').format('YYYY-MM-DD');
+      state.resViewEnd = moment(state.resViewEnd).add(1,'day').format('YYYY-MM-DD');
+    },
+    resViewMinusWeek( state ){
+      state.resViewStart = moment(state.resViewStart).subtract(1,'week').format('YYYY-MM-DD');
+      state.resViewEnd = moment(state.resViewEnd).subtract(1,'week').format('YYYY-MM-DD');
+    },
+    resViewPlusWeek( state ){
+      state.resViewStart = moment(state.resViewStart).add(1,'week').format('YYYY-MM-DD');
+      state.resViewEnd = moment(state.resViewEnd).add(1,'week').format('YYYY-MM-DD');
+    },
+    resViewSetStart( state, val){
+      console.log("val @ set", val);
+      state.resViewStart = val;
+    },
+    
+    
     setCreateReservation( state, createReservation ){
       state.createReservation = createReservation;
+    },
+    setCreateReservationAvailableSpaces( state, spaceArr ){
+      state.createReservationAvailableSpaces = spaceArr;
     },
     setReservations(state, reservations){
       state.reservations = reservations;
@@ -126,6 +167,14 @@ export default new Vuex.Store({
     },
     setSelectGroups( state, selectGroups ){
       state.selectGroups = selectGroups;
+    },
+    toggleSpaceShowSubspaces( state, spaceId ){
+      //IMPORTANT!  note how the boolean is stored in the database
+      //as '0' or '1'.  when we fetch the value, we cast the value
+      //to boolean, using (bool)$obj->show_subspaces in PDO query.
+      //When it came across as '0' or '1', the behavior here was erratic
+      console.log("toggling store, spaceId: ", spaceId);
+      state.spaces[spaceId].show_subspaces = !state.spaces[spaceId].show_subspaces;
     },
     setSpaces( state, spaces ){
       state.spaces = spaces;
@@ -147,13 +196,16 @@ export default new Vuex.Store({
   },
   actions: {
     getReservations(context){
-      //context.commit('showLoader');
       api.getReservations().
         then(  function(response){
-          //context.commit('hideLoader');
-          console.log("response.data @ store action", response.data);
           context.commit('setReservations', response.data);
         });
+    },
+    getSpaces(context){
+      api.getSpaces().
+        then(  function(response){
+          context.commit('setSpaces', response.data.spaces);
+        });     
     },
     loadSelectedReservation(context, resId){
       //context.commit('showLoader');

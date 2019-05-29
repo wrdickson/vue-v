@@ -1,6 +1,8 @@
 <template>
 <div>
   <v-btn outline @click="returnToTimeline">Timeline</v-btn>
+  <v-btn outline color="blue" @click="scrollTimelineTop">Scroll Top</v-btn>
+  <v-btn outline color="blue" @click="scrollToLaCasa">Scroll To LaCasa</v-btn>
   <T1 
     v-on:reservationSelected="fireReservationView"
     v-if="showTimeline" 
@@ -27,18 +29,63 @@ export default {
   },
   computed:{
     reservations1(){
+      let self = this;
       let dbItems = [];
       _.forEach( this.$store.getters.getReservations , function( value ){
-        let iItem = {
-          className: 'red',
-          id: value.id,
-          group: value.space_id,
-          content: "cust-" + value.customer,
-          start: moment(value.checkin).format('YYYY-MM-DD') + " 00:00:00",
-          end: moment(value.checkout).format('YYYY-MM-DD')+ " 00:00:00"
-        }
-        dbItems.push(iItem);
-      })
+          let iItem = {
+            
+            id: value.id,
+            group: value.space_id,
+            content: "cust-" + value.customer,
+            start: moment(value.checkin).format('YYYY-MM-DD') + " 00:00:00",
+            end: moment(value.checkout).format('YYYY-MM-DD')+ " 00:00:00"
+          };
+          dbItems.push(iItem);
+          
+          
+          //check to see if this is a subspace of another and create appropriate
+          //'dummy' items
+          _.forEach( self.groups, function( group ){
+            //note, we need to parseInt() the value.space id since it's a string value
+            if( group.nestedGroups && _.includes( group.nestedGroups, parseInt(value.space_id) ) == true){
+              let bItem = {
+                className: 'dummy',
+                id: 'dummy' + value.id + '|' + group.id,
+                group: group.id,
+                content: "dummy-" + value.customer,
+                start: moment(value.checkin).format('YYYY-MM-DD') + " 00:00:00",
+                end: moment(value.checkout).format('YYYY-MM-DD')+ " 00:00:00"
+              }; 
+              dbItems.push(bItem);
+            }
+          });
+          
+          
+          
+          //now, create "dummy" reservations if there are multiple space codes
+          //this will show blocks on sub spaces
+          let spaceCodeArray = value.space_code.split(',');
+          if(spaceCodeArray.length > 1){
+            _.forEach( spaceCodeArray, function ( scIteration ){
+              //don't make a duplicate 
+              if( scIteration != value.space_id){
+                let dItem = {
+                  
+                  //each item needs an unique id, so we arbitrarily add the 
+                  //pipe and the iteration number
+                  id: value.id + '|' + scIteration,
+                  group: scIteration,
+                  //group: iSpaceCode,
+                  content: "cust-" + value.customer,
+                  start: moment(value.checkin).format('YYYY-MM-DD') + " 00:00:00",
+                  end: moment(value.checkout).format('YYYY-MM-DD')+ " 00:00:00"
+                }
+                dbItems.push(dItem);
+              }
+            });
+          
+          }
+      });
       return dbItems;
     }    
   },
@@ -94,6 +141,7 @@ export default {
       },
       {
         id: 180,
+        className: 'laCasa',
         content: 'La Casa',
         visible: true,
 
@@ -110,8 +158,10 @@ export default {
       },
       {
         id: 204,
+        className: "group204",
         content: 'Room 20',
         nestedGroups: [200,201,202,203],
+        subgroupStack: false,
         showNested: false,
         visible: true
       },
@@ -148,6 +198,7 @@ export default {
       {
         id: 236,
         content: 'Room 23',
+        className: 'room23',
         nestedGroups: [230,231,232,233,234,235],
         showNested: false,
         visible: true
@@ -216,6 +267,24 @@ export default {
       this.showTimeline = false;
       this.showReservation = true;
     },
+    scrollTimelineTop: function(){
+      console.log("scroll");
+      var scrollerElement = document.querySelector('#resTimeline .vis-vertical-scroll');
+      scrollerElement.scrollTop = 0;
+    },
+    scrollToLaCasa: function(){
+
+
+      let element = document.getElementsByClassName('room23')[1];
+      console.log('element', element);
+      var rect = element.getBoundingClientRect();
+      console.log(rect.top, rect.right, rect.bottom, rect.left);      
+      //document.getElementsByClassName('room23')[0].scrollIntoView();
+    
+    
+
+      
+    },
     toReservation: function(){
       this.showTimeline = false;
       this.showReservation = true;     
@@ -233,3 +302,10 @@ export default {
 }
 
 </script>
+
+<style scoped>
+.dummy{
+  background-color: #121212 !important;
+}
+
+</style>

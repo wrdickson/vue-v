@@ -1,4 +1,5 @@
 import axios from 'axios'
+
 let api = {
   addReservation: (customer, start, end, space_id, people, beds)=>{
     let promise  = axios({
@@ -28,6 +29,13 @@ let api = {
       url: '/api/checkAvailability/'
     });
     return promise;
+  },
+  checkAvailabilityByDates: ( start, end ) => {
+    let promise  = axios({
+      method: 'get',
+      url: '/api/checkAvailabilityByDates/' + start + '/' + end 
+    });
+    return promise;    
   },
   checkUpdateAvailability: (start, end, space_code, people, beds, resId)=>{
     let promise  = axios({
@@ -130,8 +138,8 @@ let api = {
   },
   searchCustomers: (lastName, firstName ) => {
     const request = axios({
-      method: 'get',
-      params: {
+      method: 'post',
+      data: {
         lastName: lastName,
         firstName: firstName
       },

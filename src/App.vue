@@ -24,7 +24,7 @@
             <v-icon>contact_mail</v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
-            <v-list-tile-title >Contact</v-list-tile-title>
+            <v-list-tile-title >About</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
         
@@ -46,7 +46,6 @@
           </v-list-tile-content>
         </v-list-tile>
         
-        
         <v-list-tile v-ripple to="/reservations" >
           <v-list-tile-action>
             <v-icon>view_comfy</v-icon>
@@ -55,6 +54,16 @@
             <v-list-tile-title >Reservations</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
+        
+        <v-list-tile v-ripple to="/resTable">
+          <v-list-tile-action>
+            <v-icon>view_comfy</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title >ResTable</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>        
+
 
 
       </v-list>
@@ -62,18 +71,21 @@
     </v-navigation-drawer>
     <v-toolbar color="indigo" dark fixed dense app>
       <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
-      <v-toolbar-title>Lazy Lizard Hostel</v-toolbar-title>
+      <v-spacer></v-spacer>
+
+        
+
     </v-toolbar>
     <v-content>
-      <v-container fluid fill-height>
-        <v-layout column>
+      <v-container fluid >
           <router-view></router-view>
-        </v-layout>
       </v-container>
     </v-content>
+    <!--
     <v-footer color="indigo" app>
       <span class="white--text">&copy; 2019</span>
     </v-footer>
+    -->
   </v-app>
 </template>
 
@@ -88,29 +100,40 @@
       //load initial space information
       var self = this;
       api.getSpaces().then( function(response){
-        console.log("spaces:",response);
         self.$store.commit('setSpaces', response.data.spaces);
       });
       api.getSpaceTypes().then( function(response){
-        console.log("spaceTypes:",response);
         self.$store.commit('setSpaceTypes', response.data.space_types);
       });
       api.getSelectGroups().then( function(response){
-        console.log("selectGroups:",response);
         self.$store.commit('setSelectGroups', response.data.selectGroups);
+      });
+      api.getReservations().then( function(response){
+        self.$store.commit('setReservations', response.data);
       });
     },
     computed: {
       loaderShown(){
         return this.$store.getters.getLoaderShown
       },
-      
+      routeIsResTable(){
+        if(this.$route.name == 'resTable'){
+          return true;
+        }else{
+          return false;
+        }
+      }
     },
     data: function(){
         return {
             drawer: null,
-            user: this.$store.getUser
+            user: this.$store.getUser,
+            resDatePicker: false,
+            resStart: '2019-05-21'
          }
+    },
+    methods: {
+
     },
     props: {
       source: String
@@ -119,5 +142,6 @@
 </script>
 
 <style>
+
 
 </style>

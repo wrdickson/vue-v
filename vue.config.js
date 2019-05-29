@@ -7,7 +7,9 @@ module.exports = {
   devServer: {
     proxy: 'http://localhost:80'
   },
+  
   //DO NOT USE baseUrl UNTIL YOU ARE BUILDING!!
+  
   //Remember to RESTART the DEV SERVER after setting this, but
   //BEFORE running build
   //THEN set it back to blank for local work
@@ -19,6 +21,6 @@ module.exports = {
   //baseUrl: '/b/' //to deploy to b at mytrail.org/b/
   
   //??use this when building to serve from localhost with apache
-  //baseUrl: '/vue-b/dist/' 
+  //baseUrl: '/vue-v/dist/' 
 
 };

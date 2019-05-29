@@ -30,6 +30,7 @@
               </template>
               <v-date-picker 
                 v-model="reservation.checkin" 
+                :allowedDates="allowedCheckinDates"
                 @input="ciInput"
               />
             </v-menu>
@@ -60,6 +61,7 @@
               </template>
               <v-date-picker 
                 v-model="reservation.checkout" 
+                :allowedDates="allowedCheckoutDates"
                 @input="coInput"
                 />
             </v-menu>
@@ -80,13 +82,14 @@
             <v-card>
               <v-card-text>
                 <ul class="spaceList">
-                  <li v-for="item in selectGroups"
+                  <li v-for="item in selectGroupsFilterByDateAvailability"
                     v-bind:key="item.title"
                   >
                     <v-select
                       :items="item.groups"
                       :label="item.title"
                       @change="spaceSelect"
+                      
                     >
                     </v-select>
                   </li>
@@ -123,6 +126,7 @@
             label="Beds"
             item-text="text"
             item-value="value"
+            
           ></v-select>        
         </v-flex>     
    
@@ -135,8 +139,15 @@
         
       </v-layout>
     </v-form>    
-  </v-layout> 
-  <CustomerSearch/>
+  </v-layout>
+  
+  <v-layout row>
+    <CustomerSearch/>
+  </v-layout>
+  
+  <v-layout row>
+    <v-btn ripple @click="createReservation" color="success">Create Reservation</v-btn>
+  </v-layout>
     
     
     
@@ -144,6 +155,7 @@
 </template>
 
 <script>
+  import api from './../api/api.js'
   import moment from 'moment'
   import _ from 'lodash'
   export default {
@@ -153,7 +165,10 @@
     computed:{
       bedsSelect: {
         get: function(){
-          return this.reservation.beds;
+          return {
+            text: this.reservation.beds,
+            value: this.reservation.beds
+            }
         },
         set: function(val){
           this.reservation.beds = val;
@@ -169,6 +184,11 @@
           return moment(this.reservation.checkout).format('MMM DD YYYY');
         }
       },
+      createReservationAvailableSpaces: {
+        get: function(){
+          return this.$store.getters.getCreateReservationAvailableSpaces;
+          }
+      },
       peopleSelect: {
         get: function(){
           return {
@@ -177,7 +197,6 @@
             }
         },
         set: function(val){
-          console.log("val",val);
           this.reservation.people = val;
         }
       }, 
@@ -185,7 +204,26 @@
         return this.$store.getters.getSpaces[this.reservation.space_id].description;
       },
       selectGroups: function(){
-        return this.$store.getters.getSelectGroups;
+        return JSON.parse(JSON.stringify(this.$store.getters.getSelectGroups));
+      },
+      selectGroupsFilterByDateAvailability: function(){
+        let self = this;
+        let filtered = [];
+        let selG = JSON.parse(JSON.stringify(this.selectGroups));
+        _.forEach(selG, function (itGroup){
+          let group = {};
+          group.id = itGroup.id
+          group.order = itGroup.order;
+          group.title = itGroup.title;
+          group.groups = [];
+          _.forEach( itGroup.groups, function(subGroup){
+            if( _.includes( self.createReservationAvailableSpaces, subGroup.space_id)){
+              group.groups.push(subGroup);
+            }
+          });
+          filtered.push(group);
+        });
+        return filtered;
       },
       spacesByType: function(){
         let self = this;
@@ -201,6 +239,7 @@
     },
     data: function(){
       return{
+        //createReservationAvailableSpaces: this.$store.getters.getCreateReservationAvailableSpaces,
         //note that value is a string . . . problems until I figured
         //this out
         bedOptions: [
@@ -243,17 +282,65 @@
       }
     },
     methods:{
+      allowedCheckinDates: function(val){
+        if(val < this.reservation.checkout){
+          return true;
+        }
+      },
+      allowedCheckoutDates: function(val){
+        if(val > this.reservation.checkin){
+          return true;
+        }
+      },
       ciInput: function(){
-        this.checkinMenu = false;
-        this.$refs.ciMenu.save(this.reservation.checkin);
+        let self = this;
+        this.$store.commit('showLoader');
+        api.checkAvailability( this.reservation.checkin, this.reservation.checkout, this.reservation.space_code, this.reservation.people, this.reservation.beds).then( function(response){
+          if( response.data.query.available == true){
+            //commit the new data
+            self.$refs.ciMenu.save(self.reservation.checkin); 
+            //update available spaces
+            api.checkAvailabilityByDates( self.reservation.checkin, self.reservation.checkout ).then( 
+              function( response ){
+                self.$store.commit('hideLoader');
+                self.$store.commit( 'setCreateReservationAvailableSpaces', Object.values(response.data.available_space_ids) );
+                self.checkinMenu = false;
+              });  
+          } else {
+            self.$store.commit('hideLoader');
+            self.checkinMenu = false;
+            alert("not available");
+          }
+        });
       },
       coInput: function(){
-        this.checkoutMenu = false;
-        this.$refs.coMenu.save(this.reservation.checkout);
+        let self = this;
+        this.$store.commit('showLoader');
+        api.checkAvailability( this.reservation.checkin, this.reservation.checkout, this.reservation.space_code, this.reservation.people, this.reservation.beds).then( function(response){
+          if( response.data.query.available == true){
+            //commit the new data
+            self.$refs.coMenu.save(self.reservation.checkout);          
+            //update available spaces
+            api.checkAvailabilityByDates( self.reservation.checkin, self.reservation.checkout ).then( 
+              function( response ){
+                self.$store.commit('hideLoader');
+                self.$store.commit( 'setCreateReservationAvailableSpaces', Object.values(response.data.available_space_ids) );
+                self.checkoutMenu = false;
+              });  
+          } else {
+            self.$store.commit('hideLoader');
+            self.checkoutMenu = false;
+            alert("not available");
+          }
+        });
       },
-      revert: function() {
+      createReservation: function(){
       
       },
+      revert: function() {
+        this.reservation = JSON.parse(JSON.stringify(this.$store.getters.getCreateReservation));
+      },
+
       spaceModal: function(){
         console.log("modal");
         console.log(this.$store.getters.getSpaces.length);

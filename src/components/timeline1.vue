@@ -1,12 +1,14 @@
 <template>
   <div class="tline grey lighten-5">
     <Timeline ref="timeline"
+      id="resTimeline"
       :items="items"
       :groups="groups"
       :options="options"
-      :events="['click', 'select']"
+      :events="['click', 'select','changed']"
       @click="timelineClick" 
       @select="timelineSelect"
+      @changed="timelineChanged"
     >
     </Timeline>
   </div>
@@ -17,15 +19,24 @@ import { Timeline } from 'vue2vis'
 import moment from 'moment'
 import 'vue2vis/dist/vue2vis.css'
 import axios from 'axios'
+import api from './../api/api.js'
 export default{
   components: {
     Timeline
   },
   methods:{
+    //this is necessary to fix the rendering when a group is opened
+    //strangely . . . vue2vis seems to trigger @changed frequently
+    //all by itself . . .  maybe to check for reactivity changes??
+    //does this negatively impact performance?????????
+    timelineChanged: function(){
+      this.$refs.timeline.redraw();
+    },
     timelineClick: function( obj ){
+      console.log("obj",obj);
       //test to see if the user clicked on a reservation (item)
       //or if they clicked on an empty date
-      if(obj.item == null){
+      if(obj.item == null && obj.what == 'background'){
         //obj.group is the space_id of the selected item (room,house, whatever)
         //obj.time is the time string emitted by the timeline @ click
         //get space code from store
@@ -58,28 +69,41 @@ export default{
           status: '0',
           notes: []
         }
-        //commit this to store
-        this.$store.commit('setCreateReservation', params);
-        //fire the route
-        this.$router.push('createReservation');          
+        //get available spaces based on these dates
+        this.$store.commit('showLoader');
+        let self = this;
+        api.checkAvailabilityByDates( params.checkin, params.checkout ).then( 
+          function( response ){
+            self.$store.commit('hideLoader');
+            //note the db returns an associative array . . we want a simple array
+            //ergo Object.values(etc
+            self.$store.commit( 'setCreateReservationAvailableSpaces', Object.values(response.data.available_space_ids) );
+            console.log("available spaces", response);
+            //commit this to store
+            self.$store.commit('setCreateReservation', params);
+            //fire the route
+            self.$router.push('createReservation');
+          });
+          
       }
-
-      
       
     },
     //this fires when the user clicks on an item ie. a reservation
     timelineSelect: function( obj ){
       console.log("select",obj);
-      let self = this;
-      this.$store.commit('showLoader');
-      return axios.get('/api/reservations/' + obj.items[0])
-        .then( function(response){
-          self.$store.commit('hideLoader');
-          self.$store.commit('setSelectedReservation', response.data);
-          self.$store.commit('setSelectedOriginalReservation', response.data);
-          //emit an event back to Reservations.vue which will handle it
-          self.$emit('reservationSelected', obj.items[0]);         
-        });      
+      //don't do anything if it's a 'dummy' block
+      if(obj.items[0].substring(0,5) != 'dummy'){
+        let self = this;
+        this.$store.commit('showLoader');
+        return axios.get('/api/reservations/' + obj.items[0])
+          .then( function(response){
+            self.$store.commit('hideLoader');
+            self.$store.commit('setSelectedReservation', response.data);
+            self.$store.commit('setSelectedOriginalReservation', response.data);
+            //emit an event back to Reservations.vue which will handle it
+            self.$emit('reservationSelected', obj.items[0]);         
+          }); 
+      }
     }
   },
   props: {
@@ -91,16 +115,16 @@ export default{
 </script>
 
 <style>
-.red{
-  background-color: limegreen !important;
-  border-color: #000 !important;
+.dummy{
+  background-color: #121212 !important;
+  margin-right: 2px solid #121212 !important;
+  margin-left: 2px solid #121212 !important;
 }
-.vis-item {
-  border-color: orange;
-  background-color: yellow;
-}
+
 .tline{
   font-size: .85em;
 }
+
+
 
 </style>

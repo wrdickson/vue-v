@@ -49,6 +49,11 @@ export default new Router({
       path: '/reservations',
       name: 'reservations',
       component: Reservations
+    },
+    {
+      path: '/resTable',
+      name: 'resTable',
+      component: () => import(/* webpackChunkName: "ResTable1" */ './views/ResTable.vue')
     }
   ]
 })
