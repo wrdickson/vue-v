@@ -1,13 +1,15 @@
 <template>
   <div>
     <v-layout wrap>
-      <v-flex xs12 sm4 md2>
-      
+      <v-flex xs12 sm3 md2>
+        <v-btn class="mx-2" outline small fab color="blue darken-3" @click='minusDay'>
+          -1
+        </v-btn>      
         <v-btn fab small @click='minusWeek'>
         -7
         </v-btn>
-        <v-btn fab small @click='minusDay'>
-        -1
+        <v-btn fab small @click='minusMonth'>
+        -30
         </v-btn>
 
         <v-menu
@@ -19,8 +21,8 @@
           lazy
           transition="scale-transition"
           offset-y
-          full-width
-          min-width="200px"
+          label='Calendar Start'
+          min-width="290px"
         >
           <template v-slot:activator="{ on }">
             <v-text-field
@@ -44,8 +46,8 @@
         </v-btn>
       
       </v-flex>
-    
-      <v-flex xs12 sm8 md10>
+
+      <v-flex xs12 sm9 md10>
         <div style="float: left;" >
           <table class="groupsTable">
             <tbody>
@@ -417,7 +419,7 @@
 
       resDateInput: function( ){
         this.resDatePicker = false;
-        this.$refs.resDate.save(this.reStart);
+        this.$refs.resDate.save(this.start);
       },
       minusWeek: function(){
         
@@ -442,8 +444,7 @@
         console.log("reservations changed", val, oldVal);
         this.constructTable();
       },
-      spacesData: function(val, oldVal){
-        
+      spacesData: function(){
         console.log("spacesData change");
       },
       start: function( val, oldVal){

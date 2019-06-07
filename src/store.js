@@ -144,6 +144,7 @@ export default new Vuex.Store({
     resViewSetStart( state, val){
       console.log("val @ set", val);
       state.resViewStart = val;
+      state.resViewEnd= moment(val).add(1,'month').format('YYYY-MM-DD');
     },
     
     

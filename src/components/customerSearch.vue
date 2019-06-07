@@ -7,14 +7,14 @@
       <v-flex xs6>
         <v-text-field
           label="Last Name"
-          v-model='workingCustomer.lastName'
+          v-model='searchCustomer.lastName'
           clearable
         ></v-text-field>
       </v-flex>
       <v-flex xs6>
         <v-text-field
           label="First Name"
-          v-model='workingCustomer.firstName'
+          v-model='searchCustomer.firstName'
           clearable
         ></v-text-field>
       </v-flex>
@@ -102,6 +102,7 @@ export default {
   },
   data: function(){
     return{
+      
       customerSelectHeaders: [
         {
           text: 'Last Name',
@@ -120,11 +121,6 @@ export default {
         lastName: '',
         firstName: ''
       },
-      workingCustomer: {
-        id: '0',
-        lastName: '',
-        firstName: ''    
-      },
       searchCustomerList: [],
       showCustomerSelect: false
     }
@@ -136,13 +132,15 @@ export default {
       console.log("c",c[0]);
       this.workingCustomer = c[0];
       this.showCustomerSelect = false;
+      
+      this.$emit("customer-selected", c[0]);
     },
     searchCustomers: function(){
       this.showCustomerSelect = true;
       console.log("search");
       let self = this;
       this.$store.commit('showLoader');
-      api.searchCustomers(this.workingCustomer.lastName, this.workingCustomer.firstName).then( function( response ){
+      api.searchCustomers(this.searchCustomer.lastName, this.searchCustomer.firstName).then( function( response ){
         self.$store.commit('hideLoader');
         console.log("response", response.data.customers);
         self.searchCustomerList= response.data.customers;

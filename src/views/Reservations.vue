@@ -3,13 +3,7 @@
   <v-btn outline @click="returnToTimeline">Timeline</v-btn>
   <v-btn outline color="blue" @click="scrollTimelineTop">Scroll Top</v-btn>
   <v-btn outline color="blue" @click="scrollToLaCasa">Scroll To LaCasa</v-btn>
-  <T1 
-    v-on:reservationSelected="fireReservationView"
-    v-if="showTimeline" 
-    :groups="groups" 
-    :items="reservations1" 
-    :options="options"
-  />
+
   <Reservation 
     transition="slide-x-transition"
     v-if="showReservation"
@@ -24,7 +18,7 @@ import moment from 'moment'
 import _ from 'lodash'
 export default {
   components:{
-    T1: () => import('./../components/timeline1.vue'),
+    //T1: () => import('./../components/timeline1.vue'),
     Reservation: () => import('./../views/Reservation.vue')
   },
   computed:{

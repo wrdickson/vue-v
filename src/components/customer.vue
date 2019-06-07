@@ -100,17 +100,24 @@
     </div>
     <v-layout row>
       <v-btn
-        color="error"
-        @click="reset"
+        v-on:click="$emit('reset-customer')"
       >
-        Reset Form
+        Reset Customer
       </v-btn>
       <v-btn
-        v-if="valid"
-        color="success"
-        @click="submit"
+        v-if="customerIsSelected"
+        :disabled="!valid"
+        @click="updateCustomer"
+        outline
       >
-        Submit
+        Update Customer
+      </v-btn>
+      <v-btn
+        v-if="!customerIsSelected"
+        :disabled="!valid"
+        @click="createCustomer"
+      >
+        Create Customer
       </v-btn>
     </v-layout>
   </v-form>
@@ -118,15 +125,20 @@
 
 <script>
 export default {
+  computed: {
+    customerIsSelected: {
+        get: function(){
+          if( this.customer.id > 0){
+            return true;
+          } else { return false; }
+        }
+    }
+  },
   data: function(){
     return{
       valid: false,
-      customer: JSON.parse(JSON.stringify(this.$store.getters.getSelectedReservation.customer)),
       expandedCustomer: false,
       expandedCustomerText: "More",
-      originalCustomer: {},
-      
-      
       //form rules . . .
       addressRules: [
         v => v.length <= 40 || 'FirstName must be less than 40 characters'      
@@ -138,15 +150,24 @@ export default {
     }
   },
   methods: {
-    toggleCustomerExpanded: function(){
-      this.expandedCustomer = !this.expandedCustomer;
+    createCustomer: function(){
+      this.$emit('create-customer');
     },
-    reset: function(){
-      this.customer = JSON.parse(JSON.stringify(this.$store.getters.getSelectedReservation.customer));
+    resetCustomer: function(){
+      this.$emit("reset-customer");
     },
     submit: function(){
       console.log(this.customer);
+    },
+    toggleCustomerExpanded: function(){
+      this.expandedCustomer = !this.expandedCustomer;
+    },
+    updateCustomer: function(){
+      this.$emit('update-customer');
     }
+  },
+  props: {
+    customer: Object
   }
 
 }

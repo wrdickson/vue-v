@@ -18,7 +18,7 @@ module.exports = {
   
   //okay, i build this with baseUrl: b, and it seems to work
   //when i run dist from the apache server????/
-  //baseUrl: '/b/' //to deploy to b at mytrail.org/b/
+  //baseUrl: '/vue-v/' //to deploy to b at mytrail.org/vue-v/
   
   //??use this when building to serve from localhost with apache
   //baseUrl: '/vue-v/dist/' 

@@ -62,18 +62,22 @@
           <v-list-tile-content>
             <v-list-tile-title >ResTable</v-list-tile-title>
           </v-list-tile-content>
+        </v-list-tile> 
+
+        <v-list-tile v-ripple to="/reservationView">
+          <v-list-tile-action>
+            <v-icon>view_comfy</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title >Reservation View</v-list-tile-title>
+          </v-list-tile-content>
         </v-list-tile>        
 
-
-
       </v-list>
-
     </v-navigation-drawer>
     <v-toolbar color="indigo" dark fixed dense app>
       <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
       <v-spacer></v-spacer>
-
-        
 
     </v-toolbar>
     <v-content>

@@ -52,6 +52,17 @@ let api = {
     });
     return promise;
   },
+  createCustomer: ( user, customer ) => {
+    let promise  = axios({
+      data: {
+        user: user,
+        customer: customer
+      },
+      method: 'post',
+      url: '/api/customers/'
+    });
+    return promise;    
+  },
   getInitialData: () => {
     
   },
