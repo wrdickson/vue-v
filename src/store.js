@@ -133,9 +133,17 @@ export default new Vuex.Store({
       state.resViewStart = moment(state.resViewStart).add(1,'day').format('YYYY-MM-DD');
       state.resViewEnd = moment(state.resViewEnd).add(1,'day').format('YYYY-MM-DD');
     },
+    resViewMinusMonth( state ){
+      state.resViewStart = moment(state.resViewStart).subtract(1,'month').format('YYYY-MM-DD');
+      state.resViewEnd = moment(state.resViewEnd).subtract(1,'month').format('YYYY-MM-DD');
+    },
     resViewMinusWeek( state ){
       state.resViewStart = moment(state.resViewStart).subtract(1,'week').format('YYYY-MM-DD');
       state.resViewEnd = moment(state.resViewEnd).subtract(1,'week').format('YYYY-MM-DD');
+    },
+    resViewPlusMonth( state ){
+      state.resViewStart = moment(state.resViewStart).add(1,'month').format('YYYY-MM-DD');
+      state.resViewEnd = moment(state.resViewEnd).add(1,'month').format('YYYY-MM-DD');
     },
     resViewPlusWeek( state ){
       state.resViewStart = moment(state.resViewStart).add(1,'week').format('YYYY-MM-DD');

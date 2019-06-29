@@ -44,6 +44,9 @@
         <v-btn fab small @click='plusWeek'>
         +7
         </v-btn>
+        <v-btn fab small @click='plusMonth'>
+        +30
+        </v-btn>
       
       </v-flex>
 
@@ -140,7 +143,10 @@
                           v-for='date in dateArray'
                           v-bind:key='date'
                           :id="space.space_id + '|' + date"
+                          :data-date= "date" 
+                          :data-space-id= "space.space_id"
                           class='itemTd resTd'
+                          @click="resClick(space.space_id, date, $event)"
                           nowrap
                         >
                         </td>
@@ -344,10 +350,10 @@
 
         //this is where we coordinate scrolling between the two tables
         document.getElementById('innerDiv').onscroll = function(e){
-          console.log('scrollheight',document.getElementById('innerDiv').scrollHeight);
-          console.log('bot',document.getElementById('innerDiv').getBoundingClientRect().bottom);
-          console.log('dif', document.getElementById('innerDiv').getBoundingClientRect().bottom - document.getElementById('innerDiv').scrollTop);
-          console.log('windowheight', window.innerHeight);
+          //console.log('scrollheight',document.getElementById('innerDiv').scrollHeight);
+          //console.log('bot',document.getElementById('innerDiv').getBoundingClientRect().bottom);
+          //console.log('dif', document.getElementById('innerDiv').getBoundingClientRect().bottom - document.getElementById('innerDiv').scrollTop);
+          //console.log('windowheight', window.innerHeight);
           
           document.getElementById('groupsTable').scrollTop = e.target.scrollTop;
           
@@ -376,12 +382,28 @@
           let range1 = Moment.range(res.checkin, res.checkout);
           let days1 = Array.from(range1.by('days'));
           let resArr = days1.map(m => m.format('YYYY-MM-DD'));
+          let iterateCount = 0;
+          let lastDay = resArr.length - 1;
           _.forEach(resArr, function( d ){
             let selector = res.space_id + '|' + d;
             if(document.getElementById(selector)){
-              document.getElementById(selector).innerHTML = "<div class='reserved'>*</div>";
-              document.getElementById(selector).classList.add('resMiddleTd');
-            }              
+              //by adding the data-res-id attribute, it will signal
+              //that this cell is reserved
+              document.getElementById(selector).setAttribute('data-res-id', res.id)
+              document.getElementById(selector).innerHTML = "<div data-res-id='" + res.id +"'class='reserved'>*</div>";
+              switch( iterateCount ){
+                case 0:
+                  document.getElementById(selector).classList.add('resFirstTd')
+                  break;
+                case lastDay:
+                  document.getElementById(selector).classList.add('resLastTd')
+                  break;                  
+                default:
+                  document.getElementById(selector).classList.add('resMiddleTd')
+              }
+              
+            }
+            iterateCount += 1;              
           });
         });
         this.$store.commit('hideLoader');
@@ -400,7 +422,18 @@
           this.$store.commit('toggleSpaceShowSubspaces', spaceId);
         }
         
-      },
+      }, 
+      resClick: function(space_id, date, event ){
+        if(event.target.hasAttribute('data-res-id')){
+
+          const resId = event.target.getAttribute('data-res-id');
+          console.log("go to reservation ", resId )
+        }else{
+          const resDate = event.target.getAttribute('data-date');
+          const resSpaceId = event.target.getAttribute('data-space-id');
+          console.log("not reserved, date ", resDate, resSpaceId );
+        }
+      },        
       scrollRight: function(){
         console.log("scrollRight");
       },
@@ -422,16 +455,22 @@
         this.$refs.resDate.save(this.start);
       },
       minusWeek: function(){
-        
+        this.$store.commit('resViewMinusWeek');
       },
       minusDay: function(){
-        
+        this.$store.commit('resViewMinusDay');
+      },
+      minusMonth: function(){
+        this.$store.commit('resViewMinusMonth');
       },
       plusDay: function(){
-        
+        this.$store.commit('resViewPlusDay');
+      },
+      plusMonth: function(){
+        this.$store.commit('resViewPlusMonth');
       },
       plusWeek: function(){
-        
+        this.$store.commit('resViewPlusWeek');
       }
  
     },
@@ -455,11 +494,14 @@
   }
 </script>
 <style>
-
+  
   .reserved{
     background-color: green; 
+    color: green;
     height: 100%;
     width: 100%;
+    margin-top: -2px !important;
+    margin-bottom: -2px !important;
   }
   .resFirstTd{
     padding-left: 4px;
@@ -499,7 +541,7 @@
   }
   .groupsTable{
     border-collapse: collapse;
-    border-spacing: 1px;
+    //border-spacing: 1px;
     overflow-y: hidden;
     overflow-x: scroll;
   }

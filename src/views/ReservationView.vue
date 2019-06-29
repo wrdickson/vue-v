@@ -119,7 +119,7 @@
       updateCustomer: function(){
         const self = this;
         this.$store.commit('showLoader');
-        api.updateCustomer( this.customer).then(  function( response){
+        api.updateCustomer( this.customer ).then( function( response ){
           self.$store.commit('hideLoader');
           self.customer = response.data.updatedCustomer;
           console.log("resp", response);
@@ -127,7 +127,5 @@
       }
     },
     name: "ReservationView"
-  
   }
-  
 </script>

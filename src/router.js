@@ -29,6 +29,11 @@ export default new Router({
       component: () => import(/* webpackChunkName: "CreateReservation" */ './views/CreateReservation.vue')
     },
     {
+      path: '/eResView',
+      name: 'EResView',
+      component: () => import(/* webpackChunkName: "EResView" */ './views/eResView.vue')
+    },
+    {
       path: '/login',
       name: 'login',
       component: Login
