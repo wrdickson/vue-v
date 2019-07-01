@@ -11,7 +11,15 @@
       width="200"
     >
       <v-list dense>
-        <v-list-tile to="home">
+        <!--
+          Note the "/" before each route.
+          If these are absent, it will route correctly when clicking on these links
+          but after a programatically executed route change (ie /Sreservations/13),
+          these links will no longer work correctly.
+          Confusing as hell, point being
+          DO NOT OMIT THE PRECEDING FORWARD SLASH
+        -->
+        <v-list-tile to="/home">
           <v-list-tile-action>
             <v-icon>home</v-icon>
           </v-list-tile-action>
@@ -19,7 +27,7 @@
             <v-list-tile-title>Home</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
-        <v-list-tile v-ripple to="about" >
+        <v-list-tile v-ripple to="/about" >
           <v-list-tile-action>
             <v-icon>contact_mail</v-icon>
           </v-list-tile-action>
@@ -28,7 +36,7 @@
           </v-list-tile-content>
         </v-list-tile>
         
-        <v-list-tile v-ripple to="login" >
+        <v-list-tile v-ripple to="/login" >
           <v-list-tile-action>
             <v-icon>person</v-icon>
           </v-list-tile-action>
@@ -37,7 +45,7 @@
           </v-list-tile-content>
         </v-list-tile>
         
-        <v-list-tile v-ripple to="logoff" >
+        <v-list-tile v-ripple to="/logoff" >
           <v-list-tile-action>
             <v-icon>person</v-icon>
           </v-list-tile-action>

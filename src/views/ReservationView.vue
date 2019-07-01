@@ -56,8 +56,15 @@
           }
         }
     },
+    created: function(){
+      console.log("ReservationView created . . . ");
+      if(this.reservationId > 0){
+        this.loadReservation();
+      }
+    },
     data: function(){
       return {
+        //default customer
         customer: {
           id: '0',
           lastName: '',
@@ -71,13 +78,15 @@
           phone: '',
           email: '' 
         },
-         reservation: {
+        
+        reservation: {
+          id: '0',
           checkin: moment().format('YYYY-MM-DD'),
           checkout: moment().add(1,'day').format('YYYY-MM-DD'),
           space_code: '',
           space_id: '',
-          people: '0',
-          beds: '0',
+          people: '1',
+          beds: '1',
           space_name: '',
           customer: '0'
         }
@@ -99,6 +108,16 @@
       customerSelect: function( customer ){
         console.log("cust", customer);
         this.customer = customer;
+      },
+      loadReservation: function(){
+        const self = this;
+        api.getReservation(this.reservationId).then( function( response ){
+          console.log("response from resView: ", response);
+          //note that we load the customer from reservation data
+          self.reservation = response.data;
+          self.customer = response.data.customer
+          
+        });
       },
       resetCustomer: function(){
         console.log("resetCustomer fires");
@@ -126,6 +145,16 @@
         });
       }
     },
-    name: "ReservationView"
+    name: "ReservationView",
+    props: {
+      reservationId: String
+    },
+    watch:{
+      reservationId: function( val, oldVal ){
+        console.log("reservationId changed", val, oldVal);
+
+
+      }
+    }
   }
 </script>

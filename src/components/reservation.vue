@@ -78,7 +78,7 @@
             <v-card>
               <v-card-text>
                 <ul class="spaceList">
-                  <li v-for="item in selectGroupsFilterByDateAvailability"
+                  <li v-for="item in selectionGroups"
                     v-bind:key="item.title"
                   >
                     <v-select
@@ -156,11 +156,6 @@ export default{
         return moment(this.reservation.checkout).format('MMM DD YYYY');
       }
     },
-    createReservationAvailableSpaces: {
-      get: function(){
-        return this.$store.getters.getCreateReservationAvailableSpaces;
-        }
-    },
     peopleSelect: {
       get: function(){
         return {
@@ -181,25 +176,6 @@ export default{
     selectGroups: function(){
       return this.$store.getters.getSelectGroups;
     },
-    selectGroupsFilterByDateAvailability: function(){
-      let self = this;
-      let filtered = [];
-      let selG = JSON.parse(JSON.stringify(this.selectGroups));
-      _.forEach(selG, function (itGroup){
-        let group = {};
-        group.id = itGroup.id
-        group.order = itGroup.order;
-        group.title = itGroup.title;
-        group.groups = [];
-        _.forEach( itGroup.groups, function(subGroup){
-          if( _.includes( self.createReservationAvailableSpaces, subGroup.space_id)){
-            group.groups.push(subGroup);
-          }
-        });
-        filtered.push(group);
-      });
-      return filtered;
-    },
     spacesByType: function(){
       let self = this;
       let arr = [];
@@ -212,18 +188,9 @@ export default{
       return arr;
     }
   },
-  created: function(){
-    let self = this;
-    this.$store.commit('showLoader');
-    api.checkAvailabilityByDates( self.reservation.checkin, self.reservation.checkout ).then( 
-      function( response ){
-        self.$store.commit('hideLoader');
-        self.$store.commit( 'setCreateReservationAvailableSpaces', Object.values(response.data.available_space_ids) );
-        //self.checkinMenu = false;
-      });    
-  },
   data: function(){
     return{
+      
       //note that value is a string . . . problems until I figured
       //this out
       bedOptions: [
@@ -256,27 +223,37 @@ export default{
         { text: "11", value: '11' },
         { text: "12", value: '12' }       
       ],
+      
       //these control the visibility of the datepickers
       checkinMenu: false,
       checkoutMenu: false,
       spaceDialog: false,
       spaces: this.$store.getters.getSpaces,
-      spaceTypes: this.$store.getters.getSpaceTypes
+      spaceTypes: this.$store.getters.getSpaceTypes,
+      user: this.$store.getters.getUser
     }
   },
   methods: {
     ciInput: function(){
-        let self = this;
         this.$store.commit('showLoader');
-        api.checkAvailability( this.reservation.checkin, this.reservation.checkout, this.reservation.space_code, this.reservation.people, this.reservation.beds).then( function(response){
-          if( response.data.query.available == true){
+        //we need this to flag the query as to whether this is
+        //an existing reservtion or not.
+        let isNewReservation = true;
+        if(this.reservation.id > 0){
+          isNewReservation = false;
+        }
+        const self = this;
+        self.$store.commit('showLoader');
+        api.checkAvailability( this.user, isNewReservation, this.reservation.checkin, this.reservation.checkout, this.reservation.space_id, this.reservation.people, this.reservation.beds).then( function(response){
+          if( response.data.is_available == true){
             //commit the new data
             self.$refs.ciMenu.save(self.reservation.checkin); 
-            //update available spaces
+            //update available spaces based on the new date
             api.checkAvailabilityByDates( self.reservation.checkin, self.reservation.checkout ).then( 
               function( response ){
                 self.$store.commit('hideLoader');
-                self.$store.commit( 'setCreateReservationAvailableSpaces', Object.values(response.data.available_space_ids) );
+                console.log("emeit");
+                self.$emit('update-available-spaces', Object.values(response.data.execute.availableSpaceIds) );
                 self.checkinMenu = false;
               });  
           } else {
@@ -289,15 +266,22 @@ export default{
     coInput: function(){
         let self = this;
         this.$store.commit('showLoader');
-        api.checkAvailability( this.reservation.checkin, this.reservation.checkout, this.reservation.space_code, this.reservation.people, this.reservation.beds).then( function(response){
-          if( response.data.query.available == true){
+        //we need this to flag the query as to whether this is
+        //an existing reservtion or not.
+        let isNewReservation = true;
+        if(this.reservation.id > 0){
+          isNewReservation = false;
+        }
+        api.checkAvailability( this.user, isNewReservation, this.reservation.checkin, this.reservation.checkout, this.reservation.space_id, this.reservation.people, this.reservation.beds).then( function(response){
+          if( response.data.is_available == true){
             //commit the new data
             self.$refs.coMenu.save(self.reservation.checkout);          
             //update available spaces
             api.checkAvailabilityByDates( self.reservation.checkin, self.reservation.checkout ).then( 
               function( response ){
                 self.$store.commit('hideLoader');
-                self.$store.commit( 'setCreateReservationAvailableSpaces', Object.values(response.data.available_space_ids) );
+                console.log(response);
+                //self.$store.commit( 'setCreateReservationAvailableSpaces', Object.values(response.data.execute.availableSpaceIds) );
                 self.checkoutMenu = false;
               });  
           } else {
@@ -323,11 +307,23 @@ export default{
       this.spaceDialog = false;
     }
   },
-
+  mounted: function(){
+    //  THIS IS SUPER IMPORTANT
+    //  run this @mount to get the filtered spaces properly built
+    let self = this;
+    api.checkAvailabilityByDates( self.reservation.checkin, self.reservation.checkout ).then( 
+      function( response ){
+        self.$store.commit('hideLoader');
+        console.log("emeit");
+        self.$emit('update-available-spaces', Object.values(response.data.execute.availableSpaceIds) );
+        self.checkinMenu = false;
+      });
+  },
   props: {
-    reservationid: String,
+    availableSpaces: Array,
     reservation: Object,
-    customer: Object
+    customer: Object,
+    selectionGroups: Array
   },
   watch: {
     'reservation.space_id': function(val, oldVal){
@@ -341,9 +337,7 @@ export default{
 </script>
 
 <style scoped>
-.compactForm{
 
-}
 .spaceList ul{
   list-style: none;
 }

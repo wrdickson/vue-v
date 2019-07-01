@@ -16,16 +16,18 @@ let api = {
     });
     return promise;
   },
-  checkAvailability: (start, end, space_code, people, beds)=>{
+  checkAvailability: (user, isNewReservation, start, end, spaceId, people, beds)=>{
     let promise  = axios({
-      params: {
+      data: {
+        user: user,
+        is_new_res: isNewReservation,
         start: start,
         end: end,
-        spaceCode: space_code,
+        space_id: spaceId,
         people: people,
         beds: beds
       },
-      method: 'get',
+      method: 'post',
       url: '/api/checkAvailability/'
     });
     return promise;
@@ -36,21 +38,6 @@ let api = {
       url: '/api/checkAvailabilityByDates/' + start + '/' + end 
     });
     return promise;    
-  },
-  checkUpdateAvailability: (start, end, space_code, people, beds, resId)=>{
-    let promise  = axios({
-      params: {
-        start: start,
-        end: end,
-        spaceCode: space_code,
-        people: people,
-        beds: beds,
-        resId
-      },
-      method: 'get',
-      url: '/api/checkUpdateAvailability/'
-    });
-    return promise;
   },
   createCustomer: ( user, customer ) => {
     let promise  = axios({

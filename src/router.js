@@ -2,7 +2,6 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Home from './views/Home.vue'
 import Login from './views/Login.vue'
-import Reservation from './views/Reservation.vue'
 
 Vue.use(Router)
 
@@ -34,7 +33,7 @@ export default new Router({
       component: () => import(/* webpackChunkName: "EResView" */ './views/eResView.vue')
     },
     {
-      path: '/login',
+      path: '/login/',
       name: 'login',
       component: Login
     },
@@ -44,9 +43,9 @@ export default new Router({
       component: () => import(/* webpackChunkName: "Logoff" */ './views/Logoff.vue')
     },
     {
-      path: '/reservation/:reservationid',
+      path: '/reservations/:reservationId',
       name: 'reservation',
-      component: Reservation,
+      component: () => import(/* webpackChunkname: "ReservationView" */ './views/ReservationView.vue'),
       props: true
     },   
     {

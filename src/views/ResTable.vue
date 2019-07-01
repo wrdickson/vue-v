@@ -378,32 +378,39 @@
           element.innerHTML = '';
           element.classList.remove('resMiddleTd');
         });
+        //first, iterate through each reservation
         _.forEach(this.reservations, function(res){
-          let range1 = Moment.range(res.checkin, res.checkout);
-          let days1 = Array.from(range1.by('days'));
-          let resArr = days1.map(m => m.format('YYYY-MM-DD'));
-          let iterateCount = 0;
-          let lastDay = resArr.length - 1;
-          _.forEach(resArr, function( d ){
-            let selector = res.space_id + '|' + d;
-            if(document.getElementById(selector)){
-              //by adding the data-res-id attribute, it will signal
-              //that this cell is reserved
-              document.getElementById(selector).setAttribute('data-res-id', res.id)
-              document.getElementById(selector).innerHTML = "<div data-res-id='" + res.id +"'class='reserved'>*</div>";
-              switch( iterateCount ){
-                case 0:
-                  document.getElementById(selector).classList.add('resFirstTd')
-                  break;
-                case lastDay:
-                  document.getElementById(selector).classList.add('resLastTd')
-                  break;                  
-                default:
-                  document.getElementById(selector).classList.add('resMiddleTd')
+          let spaceArray = res.space_code.split(',');
+          //next, iterate through the space array
+          //this is to block subspaces on the table
+          _.forEach(spaceArray, function(space){
+            let range1 = Moment.range(res.checkin, res.checkout);
+            let days1 = Array.from(range1.by('days'));
+            let resArr = days1.map(m => m.format('YYYY-MM-DD'));
+            let iterateCount = 0;
+            let lastDay = resArr.length - 1;
+            _.forEach(resArr, function( d ){
+              //let selector = res.space_id + '|' + d;
+              let selector = space + '|' + d;
+              if(document.getElementById(selector)){
+                //by adding the data-res-id attribute, it will signal
+                //that this cell is reserved
+                document.getElementById(selector).setAttribute('data-res-id', res.id)
+                document.getElementById(selector).innerHTML = "<div data-res-id='" + res.id +"'class='reserved'>*</div>";
+                switch( iterateCount ){
+                  case 0:
+                    document.getElementById(selector).classList.add('resFirstTd')
+                    break;
+                  case lastDay:
+                    document.getElementById(selector).classList.add('resLastTd')
+                    break;                  
+                  default:
+                    document.getElementById(selector).classList.add('resMiddleTd')
+                }
+                
               }
-              
-            }
-            iterateCount += 1;              
+              iterateCount += 1;              
+            });
           });
         });
         this.$store.commit('hideLoader');
@@ -427,11 +434,17 @@
         if(event.target.hasAttribute('data-res-id')){
 
           const resId = event.target.getAttribute('data-res-id');
-          console.log("go to reservation ", resId )
+          console.log("go to reservation ", resId );
+          //!!! notice the tick . . . NOT a single quote!!!
+          this.$router.push( {path: `/reservations/${resId}`} );
         }else{
-          const resDate = event.target.getAttribute('data-date');
-          const resSpaceId = event.target.getAttribute('data-space-id');
-          console.log("not reserved, date ", resDate, resSpaceId );
+          
+          const checkin = event.target.getAttribute('data-date');
+          const checkout = Moment( event.target.getAttribute('data-date') ).add(1,'days').format('YYYY-MM-DD');
+          const spaceId = event.target.getAttribute('data-space-id');
+          this.$router.push( {name: 'createReservation', params: { checkin: checkin, checkout: checkout, spaceId: spaceId } });
+          
+
         }
       },        
       scrollRight: function(){

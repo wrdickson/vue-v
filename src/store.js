@@ -42,6 +42,7 @@ export default new Vuex.Store({
     },
     selectGroups: {},
     selectedReservation: {
+      id: '0',
       checkin: '2015-01-01',
       checkout: '2015-01-02',
       customer: {
