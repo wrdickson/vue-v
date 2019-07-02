@@ -5,6 +5,7 @@
     />
     <Customer
       :customer="customer"
+      :showResetCustomer="showResetCustomer"
       @reset-customer="resetCustomer"
       @update-customer="updateCustomer"
       @create-customer="createCustomer"
@@ -15,7 +16,14 @@
       :availableSpaces="availableSpaces"
       :selectionGroups="filteredSpaces"
       @update-available-spaces="updateAvailableSpaces"
-    />    
+    />
+    <v-btn
+      color="success"
+      :disabled="!reservationGo"
+      @click="createReservation"
+    >
+      Create Reservation
+    </v-btn>    
   </div>
 </template>
 
@@ -34,7 +42,13 @@
       SearchCustomer
     },
     computed: {
-      
+      reservationGo: function(){
+        if(this.customer.id > 0){
+          return true;
+        } else {
+          return false;
+        }
+      }
     },
     created: function(){
       let self = this;
@@ -77,7 +91,9 @@
           space_name: this.$store.getters.getSpaces[this.$route.params.spaceId].description,
           customer: '0'
         },
-        selectGroups: this.$store.getters.getSelectGroups
+        selectGroups: this.$store.getters.getSelectGroups,
+        showResetCustomer: true,
+        user: this.$store.getters.getUser
       }   
     },
     methods: {
@@ -85,16 +101,38 @@
         const self = this;
         api.createCustomer( this.user, this.customer).then( function(response){
           console.log("res", response);
-          if(response.data.execute == true){
+          if(response.data.newCustomerId  > 0 ){
             self.customer = response.data.newCustomer
+            self.reservation.customer = self.customer.id;
+          }else{
+            alert("Error. Customer not created.");
           }
         });        
+      },
+      createReservation: function(){
+        console.log("createReservation()");
+        console.log("reservation", this.reservation);
+        console.log("customer", this.customer);
+        console.log("user", this.user);
+        //TODO validate reservation
+        let self = this;
+        api.addReservation( this.user, this.reservation).then( function( response ){
+          console.log("createRes response", response);
+          if(response.data.execute == true){
+            //now reload reservations
+            self.$store.dispatch('getReservations');
+            //navigate to that reservation 
+            let resId = response.data.insertId;
+            self.$router.push( { name: 'reservations', params: { reservationId: resId } } );
+          }
+        });
+        
       },
       customerSelect: function( customer ){
         console.log("cust @ createReservationView", customer);
         this.customer = customer;
+        this.reservation.customer = customer.id;
       },
-
       filterGroupsByDateAvailability: function(){
         let self = this;
         let filtered = [];
@@ -114,8 +152,6 @@
         });
         return filtered;       
       },
-
-
       resetCustomer: function(){
         console.log("resetCustomer fires");
         this.customer = {
@@ -131,6 +167,8 @@
           phone: '',
           email: '' 
         };
+        //maybe this shoule work off a watch()?
+        this.reservation.customer = '0';
       },
       updateAvailableSpaces: function(spaces){
         console.log("update spaces",spaces);

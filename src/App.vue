@@ -94,6 +94,7 @@
     </v-navigation-drawer>
     <v-toolbar color="indigo" dark fixed dense app>
       <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
+      <v-toolbar-title>Lazy Lizard Reservations</v-toolbar-title>
       <v-spacer></v-spacer>
 
     </v-toolbar>

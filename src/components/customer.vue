@@ -100,6 +100,7 @@
     </div>
     <v-layout row>
       <v-btn
+        v-if="showResetCustomer"
         v-on:click="$emit('reset-customer')"
       >
         Reset Customer
@@ -167,7 +168,8 @@ export default {
     }
   },
   props: {
-    customer: Object
+    customer: Object,
+    showResetCustomer: Boolean
   }
 
 }

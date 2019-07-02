@@ -3,7 +3,6 @@
     <v-form class="compactForm">
       <v-layout row wrap >
         <v-flex xs6 sm4 md3>
-        
           <!-- Checkin datepicker -->
           <v-menu
             ref="ciMenu"
@@ -244,7 +243,8 @@ export default{
         }
         const self = this;
         self.$store.commit('showLoader');
-        api.checkAvailability( this.user, isNewReservation, this.reservation.checkin, this.reservation.checkout, this.reservation.space_id, this.reservation.people, this.reservation.beds).then( function(response){
+        api.checkAvailability( this.reservation.id, this.user, isNewReservation, this.reservation.checkin, this.reservation.checkout, this.reservation.space_id, this.reservation.people, this.reservation.beds).then( function(response){
+          console.log("response from checkAvail", response);
           if( response.data.is_available == true){
             //commit the new data
             self.$refs.ciMenu.save(self.reservation.checkin); 
@@ -252,7 +252,6 @@ export default{
             api.checkAvailabilityByDates( self.reservation.checkin, self.reservation.checkout ).then( 
               function( response ){
                 self.$store.commit('hideLoader');
-                console.log("emeit");
                 self.$emit('update-available-spaces', Object.values(response.data.execute.availableSpaceIds) );
                 self.checkinMenu = false;
               });  
@@ -272,7 +271,7 @@ export default{
         if(this.reservation.id > 0){
           isNewReservation = false;
         }
-        api.checkAvailability( this.user, isNewReservation, this.reservation.checkin, this.reservation.checkout, this.reservation.space_id, this.reservation.people, this.reservation.beds).then( function(response){
+        api.checkAvailability( this.reservation.id, this.user, isNewReservation, this.reservation.checkin, this.reservation.checkout, this.reservation.space_id, this.reservation.people, this.reservation.beds).then( function(response){
           if( response.data.is_available == true){
             //commit the new data
             self.$refs.coMenu.save(self.reservation.checkout);          
@@ -280,8 +279,7 @@ export default{
             api.checkAvailabilityByDates( self.reservation.checkin, self.reservation.checkout ).then( 
               function( response ){
                 self.$store.commit('hideLoader');
-                console.log(response);
-                //self.$store.commit( 'setCreateReservationAvailableSpaces', Object.values(response.data.execute.availableSpaceIds) );
+                self.$emit('update-available-spaces', Object.values(response.data.execute.availableSpaceIds) );
                 self.checkoutMenu = false;
               });  
           } else {
@@ -290,6 +288,9 @@ export default{
             alert("not available");
           }
         });
+    },
+    emitResChange: function(){
+      this.$emit('reservation-changed');
     },
     spaceModal: function(){
       //check to see if spaces are loaded
@@ -314,7 +315,6 @@ export default{
     api.checkAvailabilityByDates( self.reservation.checkin, self.reservation.checkout ).then( 
       function( response ){
         self.$store.commit('hideLoader');
-        console.log("emeit");
         self.$emit('update-available-spaces', Object.values(response.data.execute.availableSpaceIds) );
         self.checkinMenu = false;
       });
@@ -326,11 +326,25 @@ export default{
     selectionGroups: Array
   },
   watch: {
+    'reservation.checkin': function(val, oldVal){
+      console.log("checkin change",val, oldVal);
+      this.emitResChange();
+    },
+    'reservation.checkout': function(val, oldVal){
+      console.log("checkout change",val, oldVal);
+      this.emitResChange();
+    },
     'reservation.space_id': function(val, oldVal){
       console.log("space_id change",val, oldVal);
+      this.emitResChange();
+    },
+    'reservation.people': function(val, oldVal){
+      console.log("people change",val, oldVal);
+      this.emitResChange();
     },
     'reservation.beds': function(val, oldVal){
-      console.log("beds change",val, oldVal);      
+      console.log("beds change",val, oldVal);
+      this.emitResChange();    
     }
   }
 }

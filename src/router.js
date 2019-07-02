@@ -44,15 +44,17 @@ export default new Router({
     },
     {
       path: '/reservations/:reservationId',
-      name: 'reservation',
+      name: 'reservations',
       component: () => import(/* webpackChunkname: "ReservationView" */ './views/ReservationView.vue'),
       props: true
-    },   
-    {
-      path: '/reservations',
-      name: 'reservations',
-      component: () => import(/* webpackChunkName: "Reservations" */ './views/Reservations.vue')
     },
+       
+    //{
+    //  path: '/reservations',
+    //  name: 'reservations',
+    //  component: () => import(/* webpackChunkName: "Reservations" */ './views/Reservations.vue')
+    //},
+    
     {
       path: '/resTable',
       name: 'resTable',

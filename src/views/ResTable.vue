@@ -313,7 +313,6 @@
               }
               arr.push(obj2);
             });
-          
           });
           return arr;
         }
@@ -384,7 +383,8 @@
           //next, iterate through the space array
           //this is to block subspaces on the table
           _.forEach(spaceArray, function(space){
-            let range1 = Moment.range(res.checkin, res.checkout);
+            //shave off the last day since we don't show the checkout day on the grid
+            let range1 = Moment.range(res.checkin, Moment(res.checkout).subtract(1, 'days') );
             let days1 = Array.from(range1.by('days'));
             let resArr = days1.map(m => m.format('YYYY-MM-DD'));
             let iterateCount = 0;
@@ -399,7 +399,12 @@
                 document.getElementById(selector).innerHTML = "<div data-res-id='" + res.id +"'class='reserved'>*</div>";
                 switch( iterateCount ){
                   case 0:
-                    document.getElementById(selector).classList.add('resFirstTd')
+                    //handle the case where this is a one day reservation
+                    if( resArr.length == 1){
+                      document.getElementById(selector).classList.add('resSingleTd')
+                    } else {
+                      document.getElementById(selector).classList.add('resFirstTd')
+                    }
                     break;
                   case lastDay:
                     document.getElementById(selector).classList.add('resLastTd')
@@ -407,7 +412,6 @@
                   default:
                     document.getElementById(selector).classList.add('resMiddleTd')
                 }
-                
               }
               iterateCount += 1;              
             });
@@ -428,23 +432,21 @@
           console.log('toggle', spaceId);
           this.$store.commit('toggleSpaceShowSubspaces', spaceId);
         }
-        
       }, 
       resClick: function(space_id, date, event ){
-        if(event.target.hasAttribute('data-res-id')){
+        console.log("event.target", event.target);
+        if(event.target.hasAttribute('data-res-id') == true){
 
           const resId = event.target.getAttribute('data-res-id');
           console.log("go to reservation ", resId );
           //!!! notice the tick . . . NOT a single quote!!!
-          this.$router.push( {path: `/reservations/${resId}`} );
+          //this.$router.push( {path: `/reservations/${resId}`} );
+          this.$router.push( { name: 'reservations', params: { reservationId: resId } } );
         }else{
-          
           const checkin = event.target.getAttribute('data-date');
           const checkout = Moment( event.target.getAttribute('data-date') ).add(1,'days').format('YYYY-MM-DD');
           const spaceId = event.target.getAttribute('data-space-id');
           this.$router.push( {name: 'createReservation', params: { checkin: checkin, checkout: checkout, spaceId: spaceId } });
-          
-
         }
       },        
       scrollRight: function(){

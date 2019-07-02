@@ -1,24 +1,21 @@
 import axios from 'axios'
 
 let api = {
-  addReservation: (customer, start, end, space_id, people, beds)=>{
+  addReservation: (user, reservation)=>{
     let promise  = axios({
       data: {
-        customer: customer,
-        start: start,
-        end: end,
-        space_id: space_id,
-        people: people,
-        beds: beds
+        user: user,
+        reservation: reservation
       },
       method: 'post',
       url: '/api/reservations/'
     });
     return promise;
   },
-  checkAvailability: (user, isNewReservation, start, end, spaceId, people, beds)=>{
+  checkAvailability: (resId, user, isNewReservation, start, end, spaceId, people, beds)=>{
     let promise  = axios({
       data: {
+        res_id: resId,
         user: user,
         is_new_res: isNewReservation,
         start: start,
@@ -32,7 +29,10 @@ let api = {
     });
     return promise;
   },
-  checkAvailabilityByDates: ( start, end ) => {
+  checkAvailabilityByDates: ( start, end, resId ) => {
+    if(!resId){
+      resId = null;
+    }
     let promise  = axios({
       method: 'get',
       url: '/api/checkAvailabilityByDates/' + start + '/' + end 
@@ -141,7 +141,7 @@ let api = {
         lastName: lastName,
         firstName: firstName
       },
-      url: 'api/customerSearch/'
+      url: '/api/customerSearch/'
     });
     return request;
   },
@@ -150,6 +150,17 @@ let api = {
       url: '/api/customers/' + args.id,
       data: args,
       method: 'post'
+    });
+    return request;
+  },
+  updateReservation: ( user, reservation ) => {
+    let request = axios({
+      url: '/api/reservations/' + reservation.id,
+      data: {
+        user: user,
+        reservation: reservation
+      },
+      method: 'put'
     });
     return request;
   }

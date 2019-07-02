@@ -264,11 +264,6 @@ export default{
       this.reservation = JSON.parse(JSON.stringify(this.$store.getters.getSelectedReservation));
     },
     spaceModal: function(){
-      console.log("modal");
-      console.log(this.$store.getters.getSpaces.length);
-      //check to see if spaces are loaded
-    
-
       this.spaceDialog = true;
     },
     spaceSelect: function(evt){
@@ -282,9 +277,13 @@ export default{
       this.spaceDialog = false;
     }
   },
-
   props: {
     reservationid: String
+  },
+  watch: {
+    reservation: function(val, oldVal){
+      console.log("res changed");
+    }
   }
 }
 </script>
