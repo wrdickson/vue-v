@@ -21,7 +21,7 @@
           console.log("logoff response:", response);
           this.$store.commit('setUserToGuest');
         }
-      )
+      );
       
     }
   

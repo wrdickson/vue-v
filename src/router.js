@@ -15,22 +15,14 @@ export default new Router({
       component: Home
     },
     {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import(/* webpackChunkName: "about" */ './views/About.vue')
+      path: '/home/',
+      name: 'homeView',
+      component: Home
     },
     {
       path: '/createReservation/',
       name: 'createReservation',
       component: () => import(/* webpackChunkName: "CreateReservation" */ './views/CreateReservation.vue')
-    },
-    {
-      path: '/eResView',
-      name: 'EResView',
-      component: () => import(/* webpackChunkName: "EResView" */ './views/eResView.vue')
     },
     {
       path: '/login/',
@@ -48,23 +40,10 @@ export default new Router({
       component: () => import(/* webpackChunkname: "ReservationView" */ './views/ReservationView.vue'),
       props: true
     },
-       
-    //{
-    //  path: '/reservations',
-    //  name: 'reservations',
-    //  component: () => import(/* webpackChunkName: "Reservations" */ './views/Reservations.vue')
-    //},
-    
     {
       path: '/resTable',
       name: 'resTable',
       component: () => import(/* webpackChunkName: "ResTable1" */ './views/ResTable.vue')
     },
-    {
-      path: '/reservationView',
-      name: 'reservationView',
-      component: () => import(/* webpackChunkname: "ReservationView" */ './views/ReservationView.vue')
-      
-    }
   ]
 })

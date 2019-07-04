@@ -65,6 +65,13 @@ export default new Vuex.Store({
       firstName: '',
       lastName: ''
     },
+    shift: {
+      id: '0',
+      user: '0',
+      is_open: false,
+      start_date: '0000-00-00 00:00:00',
+      end_date: '0000-00-00 00:00:00'
+    },
     showLoader: false,
     spaces: {},
     spaceTypes: {},
@@ -106,6 +113,9 @@ export default new Vuex.Store({
     },
     getSelectGroups: state =>{
       return state.selectGroups;
+    },
+    getShift: state => {
+      return state.shift;
     },
     getSpaces: state => {
       return state.spaces;
@@ -178,6 +188,19 @@ export default new Vuex.Store({
     setSelectGroups( state, selectGroups ){
       state.selectGroups = selectGroups;
     },
+    setShift( state, shift ){
+      state.shift = shift;
+    },
+    setShiftClosed( state ){
+      let closedShift = {
+        id: '0',
+        user: '0',
+        is_open: false,
+        start_date: '0000-00-00 00:00:00',
+        end_date: '0000-00-00 00:00:00'
+      };
+      state.shift = closedShift;
+    },
     toggleSpaceShowSubspaces( state, spaceId ){
       //IMPORTANT!  note how the boolean is stored in the database
       //as '0' or '1'.  when we fetch the value, we cast the value
@@ -193,7 +216,25 @@ export default new Vuex.Store({
       state.spaceTypes = spaceTypes;
     },
     setUser (state, user){
-      state.user = user
+      let self = this;
+      state.user = user;
+      //at this point, we also need to see if the user
+      //has an open shift and set it if so . . .
+      if(user.userId > 0){
+        api.getUserShift( state.user.userId ).then( function (response) {
+          console.log("uos response:", response);
+          if(response.data.openShift.length == 1){
+            console.log("no open shifts");
+            self.commit('setShift', response.data.openShift[0]);
+          }
+          if(response.data.openShift.length == 0){
+            console.log("user has open shift");
+            self.commit('setShiftClosed');
+          }
+        });
+      } else {
+
+      }
     },
     setUserToGuest(state){
       state.user = {
@@ -201,6 +242,14 @@ export default new Vuex.Store({
         username: 'Guest',
         permission: 0,
         key: '0'
+      }
+      //also set the shift to default
+      state.shift = {
+        id: '0',
+        user: '0',
+        is_open: false,
+        start_date: '0',
+        end_date: '0'
       }
     }
   },

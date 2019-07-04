@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 let api = {
-  addReservation: (user, reservation)=>{
+  addReservation: (user, reservation)=> {
     let promise  = axios({
       data: {
         user: user,
@@ -9,6 +9,17 @@ let api = {
       },
       method: 'post',
       url: '/api/reservations/'
+    });
+    return promise;
+  },
+  addReservationNote: ( user, reservationId, note ) => {
+    let promise  = axios({
+      data: {
+        user: user,
+        note: note
+      },
+      method: 'post',
+      url: '/api/reservationNotes/' + reservationId
     });
     return promise;
   },
@@ -98,6 +109,12 @@ let api = {
       //data: user
     });
   },
+  getUserShift: ( userId ) =>{
+    return axios({
+      method: 'get',
+      url: '/api/userShift/' + userId,
+    });
+  },
   login: (username, password) => {
     console.log("firing login @ api");
     const request = axios({
@@ -121,13 +138,11 @@ let api = {
     });
     return request;
   },
-  openShift: ( userId, key, startDate)=>{
-
+  openShift: ( user, startDate )=>{
     const request = axios({
       method: 'post',
       data: {
-        userId: userId,
-        key: key,
+        user: user,
         startDate: startDate        
       },
       url: '/api/openShift/'

@@ -61,6 +61,7 @@ export default{
   },
   methods: {
     loginCheck: function(){
+      let self = this;
       this.$store.commit('showLoader');
       api.login(this.username1, this.password1).then( ( response ) => {
         this.$store.commit('hideLoader');
@@ -89,6 +90,8 @@ export default{
         //either way, clear the inputs
         this.username1 = '',
         this.password1 = ''
+        //go home
+        self.$router.push('home');
       });
     }
   }

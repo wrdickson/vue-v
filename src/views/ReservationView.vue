@@ -28,6 +28,12 @@
       @click="updateReservation"
     >Update Reservation</v-btn>
 
+    <ResNotes
+      :reservation="reservation"
+      :user="user"
+    
+    />
+
     <v-snackbar
       v-model="snackbarTrigger"
       :color="snackbarColor"
@@ -53,14 +59,14 @@
 <script>
   import Customer from './../components/customer.vue'
   import Reservation from './../components/reservation.vue'
-  //import SearchCustomer from './../components/customerSearch.vue'
+  import ResNotes from './../components/resNotes.vue'
   import api from './../api/api.js'
   import _ from 'lodash'
   export default {
     components: {
       Customer,
       Reservation,
-      //SearchCustomer
+      ResNotes
     },
     computed: {
         createButtonDisabled: {
@@ -131,7 +137,6 @@
         this.customer = customer;
       },
       filterGroupsByDateAvailability: function(){
-        console.log("select Groups @ filter()", this.selectGroups);
         let self = this;
         let filtered = [];
         let selG = JSON.parse(JSON.stringify(this.selectGroups));
@@ -171,12 +176,10 @@
         });
       },
       reservationChanged: function(){
-        console.log("resview registers change");
         //enable the update button
         this.resOriginal = false;
       },
       resetCustomer: function(){
-        console.log("resetCustomer fires");
         this.customer = {
           id: '0',
           lastName: '',
