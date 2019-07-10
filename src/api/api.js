@@ -61,6 +61,16 @@ let api = {
     });
     return promise;    
   },
+  getFolio: ( user, folioId ) => {
+    let request = axios({
+      data: {
+        user: user
+      },
+      method: 'post',
+      url: '/api/folios/' + folioId,
+    });
+     return request
+  }, 
   getInitialData: () => {
     
   },
@@ -75,6 +85,14 @@ let api = {
     let request = axios({
       method: 'get',
       url: '/api/reservations/',
+      //data: user
+      });
+     return request
+  },
+  getSalesItems: ()=>{
+    let request = axios({
+      method: 'get',
+      url: '/api/sales-items/',
       //data: user
       });
      return request

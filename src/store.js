@@ -165,8 +165,6 @@ export default new Vuex.Store({
       state.resViewStart = val;
       state.resViewEnd= moment(val).add(1,'month').format('YYYY-MM-DD');
     },
-    
-    
     setCreateReservation( state, createReservation ){
       state.createReservation = createReservation;
     },
@@ -233,7 +231,7 @@ export default new Vuex.Store({
           }
         });
       } else {
-
+        this.commit('setShiftClosed');
       }
     },
     setUserToGuest(state){

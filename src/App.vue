@@ -155,6 +155,9 @@
          }
     },
     methods: {
+      closeShift: function(){
+        console.log("closeShift()");
+      },
       logoff: function(){
         //logoff
         console.log("user before logoff", this.user);

@@ -28,6 +28,13 @@
       @click="updateReservation"
     >Update Reservation</v-btn>
 
+    <Folio
+      v-if="folio.id > 0"
+      :reservation="reservation"
+      :folio="folio"
+      :user="user"
+    />
+
     <ResNotes
       :reservation="reservation"
       :user="user"
@@ -60,13 +67,15 @@
   import Customer from './../components/customer.vue'
   import Reservation from './../components/reservation.vue'
   import ResNotes from './../components/resNotes.vue'
+  import Folio from './../components/folio.vue'
   import api from './../api/api.js'
   import _ from 'lodash'
   export default {
     components: {
       Customer,
       Reservation,
-      ResNotes
+      ResNotes,
+      Folio
     },
     computed: {
         createButtonDisabled: {
@@ -109,6 +118,9 @@
           email: '' 
         },
         filteredSpaces: [],
+        folio: {
+          id: 0
+        },
         reservation: {},
         resOriginal: true,
         selectGroups: this.$store.getters.getSelectGroups,
@@ -155,6 +167,14 @@
         });
         return filtered;       
       },
+      loadFolio: function(){
+        let self = this;
+        api.getFolio(this.user, this.reservation.folio).then(function(response){
+          console.log("response getfolio()", response);
+          self.folio = response.data.folio;
+          console.log("folio after set", self.folio);
+        });
+      },
       loadReservation: function(){
         const self = this;
         api.getReservation(this.reservationId).then( function( response ){
@@ -164,6 +184,7 @@
           self.customer = response.data.customer_obj
           //nested ASYNC!!
           // now load space availability
+          self.loadFolio();
           api.checkAvailabilityByDates( self.reservation.checkin, self.reservation.checkout).then( function(response){
             console.log("setting avail spaces @  resView created()");
             self.availableSpaces = Object.values(response.data.execute.availableSpaceIds);

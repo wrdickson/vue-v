@@ -193,6 +193,7 @@ export default{
       //note that value is a string . . . problems until I figured
       //this out
       bedOptions: [
+        { text: "0", value: '0' },
         { text: "1", value: '1' },
         { text: "2", value: '2' },
         { text: "3", value: '3' },
@@ -209,6 +210,7 @@ export default{
       //note that value is a string . . . problems until I figured
       //this out
       peopleOptions: [
+        { text: "0", value: '0' },
         { text: "1", value: '1' },
         { text: "2", value: '2' },
         { text: "3", value: '3' },
