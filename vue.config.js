@@ -5,7 +5,7 @@ module.exports = {
   //proxy the api calls for production
   //comment this out for build
   devServer: {
-    proxy: 'http://localhost:80'
+    proxy: 'http://127.0.0.1:80'
   },
   
   //DO NOT USE baseUrl UNTIL YOU ARE BUILDING!!
