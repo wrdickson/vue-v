@@ -107,7 +107,7 @@ export default {
         {
           text: 'Last Name',
           align: 'left',
-          sortable: false,
+          sortable: true,
           value: 'lastName'
         },
         { text: 'First Name', value: 'firstName' },

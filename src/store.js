@@ -8,51 +8,20 @@ export default new Vuex.Store({
   //remove this for production
   strict: true,
   state: {
-    createReservation: {
-      checkin: '0001-01-01',
-      checkout: '0001-01-02',
-      customer: {
-        firstName: "not loaded",
-        lastName: "not loaded",
-        id: '0'
-      },
-      people: '0',
-      beds: '0',
-      folio: '0',
-      history: [],
-      notes: [],
-      space_code: '0',
-      space_id: '0',
-      space_type: '0',
-      status: '0'
-    },
-    createReservationAvailableSpaces: [],
     reservations:[],
     resViewStart: moment().format('YYYY-MM-DD'),
     resViewEnd: moment().add(1,'month').format('YYYY-MM-DD'),
-    selectedOriginalReservation: {
-      beds: '1',
-      checkin: '2015-01-01',
-      checkout: '2015-01-02',
-      customer: {
-        firstName: 'not loaded',
-        lastName: 'not loaded',
-        id: '0'
-      }
-    },
     selectGroups: {},
     selectedReservation: {
       id: '0',
       checkin: '2015-01-01',
       checkout: '2015-01-02',
-      customer: {
-        firstName: "not loaded",
-        lastName: "not loaded",
-        id: '0'
-      },
+      customer: '0',
+      customer_obj: {},
       people: '0',
       beds: '0',
       folio: '0',
+      folio_obj: {},
       history: [],
       notes: [],
       space_code: '0',
@@ -60,11 +29,7 @@ export default new Vuex.Store({
       space_type: '0',
       status: '0'
     },
-    selectedCustomer: {
-      id: 0,
-      firstName: '',
-      lastName: ''
-    },
+    selectedReservationId: '0',
     shift: {
       id: '0',
       user: '0',
@@ -84,12 +49,6 @@ export default new Vuex.Store({
     }
   },
   getters: {
-    getCreateReservation: state=> {
-      return state.createReservation;
-    },
-    getCreateReservationAvailableSpaces: state => {
-      return state.createReservationAvailableSpaces;
-    },
     getLoaderShown: state => {
       return state.showLoader;
     },
@@ -102,14 +61,8 @@ export default new Vuex.Store({
     getResViewStart: state => {
       return state.resViewStart;
     },
-    getSelectedCustomer: state => {
-      return state.selectedCustomer;
-    },
     getSelectedReservation: state => {
       return state.selectedReservation;
-    },
-    getSelectedOriginalReservation: state => {
-      return state.selectedOriginalReservation;
     },
     getSelectGroups: state =>{
       return state.selectGroups;
@@ -123,9 +76,6 @@ export default new Vuex.Store({
     getSpaceTypes: state => {
       return state.spaceTypes;
     },
-    getTestVal: state => {
-      return state.testVal;
-    },
     getUser: state => {
       return state.user
     }
@@ -134,7 +84,6 @@ export default new Vuex.Store({
     //loader
     hideLoader: state => state.showLoader = false,
     showLoader: state => state.showLoader = true,    
-    
     //reservations view
     resViewMinusDay( state ){
       state.resViewStart = moment(state.resViewStart).subtract(1,'day').format('YYYY-MM-DD');
@@ -165,23 +114,11 @@ export default new Vuex.Store({
       state.resViewStart = val;
       state.resViewEnd= moment(val).add(1,'month').format('YYYY-MM-DD');
     },
-    setCreateReservation( state, createReservation ){
-      state.createReservation = createReservation;
-    },
-    setCreateReservationAvailableSpaces( state, spaceArr ){
-      state.createReservationAvailableSpaces = spaceArr;
-    },
     setReservations(state, reservations){
       state.reservations = reservations;
     },
-    setSelectedCustomer( state, customer) {
-      state.selectedCustomer = customer;
-    },
     setSelectedReservation( state, reservation){
       state.selectedReservation = reservation;
-    },
-    setSelectedOriginalReservation( state, reservation){
-      state.selectedOriginalReservation = reservation;
     },
     setSelectGroups( state, selectGroups ){
       state.selectGroups = selectGroups;
@@ -204,7 +141,7 @@ export default new Vuex.Store({
       //as '0' or '1'.  when we fetch the value, we cast the value
       //to boolean, using (bool)$obj->show_subspaces in PDO query.
       //When it came across as '0' or '1', the behavior here was erratic
-      console.log("toggling store, spaceId: ", spaceId);
+     // console.log("toggling store, spaceId: ", spaceId);
       state.spaces[spaceId].show_subspaces = !state.spaces[spaceId].show_subspaces;
     },
     setSpaces( state, spaces ){
@@ -270,10 +207,6 @@ export default new Vuex.Store({
         console.log("response",response);
         //context.commit('hideLoader');
         context.commit('setSelectedReservation', response.data);
-        //set store
-        //customer
-        context.commit('setSelectedCustomer', response.data.customer);
-        
       });      
     }
   }

@@ -27,7 +27,8 @@
             </v-menu>
         </span>
         <h3>Sales:</h3>
-        <div>folio id: {{ folio.id }}</div>
+        <div>folio id: {{ folioData.id }}</div>
+        <div>folioTrigger:  {{ folioData.folioTrigger }} </div>
         <table class="salesTable">
           <thead>
             <tr>
@@ -35,16 +36,11 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="sale in folio.sales" v-bind:key="sale.id">
+            <tr v-for="sale in folioData.sales" v-bind:key="sale.id">
               <td>{{ sale.sale_date }}</td>
-
             </tr>
           </tbody>
-
-
         </table>
-      
-
   </div>
 
 </template>
@@ -54,45 +50,48 @@
   export default{
     computed: {
 
-      
-
     },
     created: function(){
       let self = this;
-      
-
-        // Code that will run only after the
-        // entire view has been rendered
-      
         api.getSalesItems().then(function( response ){
-          console.log("self", self);
-          console.log("response",response);
           self.salesItems = response.data.items_by_group;
-
         });
-
-        //don't throw an error when this renders before the reservation is loaded
-        //in a parent component
-        if(this.reservation.hasOwnProperty('id')){
-          //load the folio
-
-        }
-        
-      
     },
     data: function(){
       return {
-
+        folioData: {
+          folioTrigger: 0,
+          id: '0',
+          sales: [],
+          payments: [],
+          customer: '0',
+          reservation: '0'
+        },
+        folioTrigger: 1,
         salesItems: {}
       }
+    },
+    methods: {
+      loadFolio: function(){
+        let self = this;
+        api.getFolio(this.user, this.reservation.folio).then(function(response){
+          self.folioData = response.data.folio;
+          self.folioTrigger += 1;
+          console.log("folioData after set", self.folioData);
+        });
+      },
     },
     name: 'Folio',
     props: {
       reservation: Object,
-      user: Object,
-      folio: Object
+      user: Object
+    },
+    watch: {
+      'reservation.id': function(val, oldVal){
+        console.log("reservation changed. val: ", val, " oldVal:", oldVal);
+        this.loadFolio();
+      }
     }
-
   }
 </script>
 

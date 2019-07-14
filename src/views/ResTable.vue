@@ -436,11 +436,8 @@
       resClick: function(space_id, date, event ){
         console.log("event.target", event.target);
         if(event.target.hasAttribute('data-res-id') == true){
-
           const resId = event.target.getAttribute('data-res-id');
           console.log("go to reservation ", resId );
-          //!!! notice the tick . . . NOT a single quote!!!
-          //this.$router.push( {path: `/reservations/${resId}`} );
           this.$router.push( { name: 'reservations', params: { reservationId: resId } } );
         }else{
           const checkin = event.target.getAttribute('data-date');

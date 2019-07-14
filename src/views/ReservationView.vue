@@ -1,10 +1,5 @@
 <template>
   <div>
-    <!--
-    <SearchCustomer
-      @customer-selected="customerSelect"
-    />
-    -->
     <Customer
       :customer="customer"
       :showResetCustmer="showResetCustomer"
@@ -29,9 +24,7 @@
     >Update Reservation</v-btn>
 
     <Folio
-      v-if="folio.id > 0"
       :reservation="reservation"
-      :folio="folio"
       :user="user"
     />
 
@@ -80,7 +73,6 @@
     computed: {
         createButtonDisabled: {
           get: function(){
-            
             let disabled = true;
             if( this.customer.id > 0 &&
                 this.reservation.people > 0 &&
@@ -90,7 +82,6 @@
             }
             return disabled            
           }
-          
         }
     },
     mounted: function(){
@@ -98,7 +89,6 @@
       if(this.reservationId > 0){
         this.loadReservation();
       }
-
     },
     data: function(){
       return {
@@ -118,9 +108,6 @@
           email: '' 
         },
         filteredSpaces: [],
-        folio: {
-          id: 0
-        },
         reservation: {},
         resOriginal: true,
         selectGroups: this.$store.getters.getSelectGroups,
@@ -167,14 +154,7 @@
         });
         return filtered;       
       },
-      loadFolio: function(){
-        let self = this;
-        api.getFolio(this.user, this.reservation.folio).then(function(response){
-          console.log("response getfolio()", response);
-          self.folio = response.data.folio;
-          console.log("folio after set", self.folio);
-        });
-      },
+
       loadReservation: function(){
         const self = this;
         api.getReservation(this.reservationId).then( function( response ){
@@ -184,7 +164,6 @@
           self.customer = response.data.customer_obj
           //nested ASYNC!!
           // now load space availability
-          self.loadFolio();
           api.checkAvailabilityByDates( self.reservation.checkin, self.reservation.checkout).then( function(response){
             console.log("setting avail spaces @  resView created()");
             self.availableSpaces = Object.values(response.data.execute.availableSpaceIds);
