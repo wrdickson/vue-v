@@ -1,7 +1,7 @@
 <template>
   <div class="folioWrapper">
     <h3>Folio</h3>
-      
+        <!--
         <span class="btnDiv">
             <v-menu 
               v-for="salesItem in salesItems" :key="salesItem.id" 
@@ -26,9 +26,11 @@
               </v-list>
             </v-menu>
         </span>
-        <h3>Sales:</h3>
-        <div>folio id: {{ folioData.id }}</div>
-        <div>folioTrigger:  {{ folioData.folioTrigger }} </div>
+        -->
+        <div>reservation.id: {{reservation.id}}</div>
+        <div>folio id: {{ computedwFolio.id }}</div>
+
+        <!--
         <table class="salesTable">
           <thead>
             <tr>
@@ -36,11 +38,12 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="sale in folioData.sales" v-bind:key="sale.id">
+            <tr v-for="sale in folioa.sales" v-bind:key="sale.id">
               <td>{{ sale.sale_date }}</td>
             </tr>
           </tbody>
         </table>
+        -->
   </div>
 
 </template>
@@ -49,48 +52,36 @@
   import api from './../api/api.js'
   export default{
     computed: {
-
+      computedwFolio(){
+        return this.$store.getters.getSelectedFolio
+      }
     },
     created: function(){
-      let self = this;
-        api.getSalesItems().then(function( response ){
-          self.salesItems = response.data.items_by_group;
-        });
+    //  let self = this;
+    //    api.getSalesItems().then(function( response ){
+    //      self.salesItems = response.data.items_by_group;
+    //    });
     },
     data: function(){
       return {
-        folioData: {
-          folioTrigger: 0,
-          id: '0',
-          sales: [],
-          payments: [],
-          customer: '0',
-          reservation: '0'
-        },
-        folioTrigger: 1,
+        //folio: this.$store.state.selectedFolio,
+   
         salesItems: {}
       }
     },
     methods: {
-      loadFolio: function(){
-        let self = this;
-        api.getFolio(this.user, this.reservation.folio).then(function(response){
-          self.folioData = response.data.folio;
-          self.folioTrigger += 1;
-          console.log("folioData after set", self.folioData);
-        });
-      },
+
     },
     name: 'Folio',
     props: {
-      reservation: Object,
-      user: Object
+      reservation: Object
     },
     watch: {
-      'reservation.id': function(val, oldVal){
-        console.log("reservation changed. val: ", val, " oldVal:", oldVal);
-        this.loadFolio();
+      reservation: function( val ){
+        console.log("reservation changed @ folio", val.folio);
+        this.$store.dispatch('loadFolio', val.folio);
       }
+
     }
   }
 </script>

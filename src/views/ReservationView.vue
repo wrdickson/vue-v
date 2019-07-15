@@ -25,7 +25,7 @@
 
     <Folio
       :reservation="reservation"
-      :user="user"
+      
     />
 
     <ResNotes

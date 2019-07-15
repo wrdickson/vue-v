@@ -11,6 +11,13 @@ export default new Vuex.Store({
     reservations:[],
     resViewStart: moment().format('YYYY-MM-DD'),
     resViewEnd: moment().add(1,'month').format('YYYY-MM-DD'),
+    selectedFolio: {
+      id: '999',
+      sales: [],
+      payments: [],
+      customer: '0',
+      reservation: '0'
+    },
     selectGroups: {},
     selectedReservation: {
       id: '0',
@@ -61,6 +68,10 @@ export default new Vuex.Store({
     getResViewStart: state => {
       return state.resViewStart;
     },
+    getSelectedFolio: function(state){
+      return state.selectedFolio;
+    },
+
     getSelectedReservation: state => {
       return state.selectedReservation;
     },
@@ -116,6 +127,9 @@ export default new Vuex.Store({
     },
     setReservations(state, reservations){
       state.reservations = reservations;
+    },
+    setSelectedFolio( state, newfolio){
+      state.selectedFolio = newfolio;
     },
     setSelectedReservation( state, reservation){
       state.selectedReservation = reservation;
@@ -189,6 +203,13 @@ export default new Vuex.Store({
     }
   },
   actions: {
+    loadFolio(context, folioId){
+      console.log("getF fires", folioId);
+      api.getFolio(context.getUuser, folioId).then(function(response){
+        console.log("new folio:", response.data.folio);
+        context.commit('setSelectedFolio', response.data.folio);
+      });
+    },
     getReservations(context){
       api.getReservations().
         then(  function(response){
