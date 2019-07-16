@@ -28,9 +28,10 @@
         </span>
         -->
         <div>reservation.id: {{reservation.id}}</div>
-        <div>folio id: {{ computedwFolio.id }}</div>
+        <div>folio id: {{ folio.id }}</div>
+        <v-btn @click="testSales">testSales</v-btn>
 
-        <!--
+        
         <table class="salesTable">
           <thead>
             <tr>
@@ -38,18 +39,20 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="sale in folioa.sales" v-bind:key="sale.id">
+            <tr v-for="sale in computedFolio.sales" v-bind:key="sale.id">
               <td>{{ sale.sale_date }}</td>
             </tr>
           </tbody>
         </table>
-        -->
+       
+        
   </div>
 
 </template>
 
 <script>
   import api from './../api/api.js'
+  import axios from 'axios'
   export default{
     computed: {
       computedwFolio(){
@@ -64,12 +67,18 @@
     },
     data: function(){
       return {
-        //folio: this.$store.state.selectedFolio,
+        folio: this.$store.state.selectedFolio,
    
         salesItems: {}
       }
     },
     methods: {
+      testSales: function(){
+        axios.get('/api/sales/2').then( function (response){
+          console.log("sales response:", response);
+        });
+
+      }
 
     },
     name: 'Folio',
