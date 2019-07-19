@@ -25,7 +25,6 @@
 
     <Folio
       :reservation="reservation"
-      
     />
 
     <ResNotes
@@ -88,6 +87,7 @@
       console.log("ReservationView created . . . ");
       if(this.reservationId > 0){
         this.loadReservation();
+
       }
     },
     data: function(){
@@ -161,7 +161,9 @@
           console.log("response from resView: ", response);
           //note that we load the customer from reservation data
           self.reservation = response.data;
-          self.customer = response.data.customer_obj
+          self.customer = response.data.customer_obj;
+          //load the folio (to store . . . fix other properties as well
+          self.$store.dispatch('loadFolio', self.reservation.folio);
           //nested ASYNC!!
           // now load space availability
           api.checkAvailabilityByDates( self.reservation.checkin, self.reservation.checkout).then( function(response){
