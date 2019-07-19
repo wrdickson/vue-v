@@ -29,7 +29,7 @@
         -->
         <div>reservation.id: {{reservation.id}}</div>
         <div>folio id: {{ folio.id }}</div>
-        <v-btn @click="testSales">testSales</v-btn>
+        <v-btn @click="testSalesItems">testSalesItems</v-btn>
 
         
         <table class="salesTable">
@@ -39,7 +39,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="sale in computedFolio.sales" v-bind:key="sale.id">
+            <tr v-for="sale in folio.sales" v-bind:key="sale.id">
               <td>{{ sale.sale_date }}</td>
             </tr>
           </tbody>
@@ -55,9 +55,7 @@
   import axios from 'axios'
   export default{
     computed: {
-      computedwFolio(){
-        return this.$store.getters.getSelectedFolio
-      }
+     
     },
     created: function(){
     //  let self = this;
@@ -73,9 +71,9 @@
       }
     },
     methods: {
-      testSales: function(){
-        axios.get('/api/sales/2').then( function (response){
-          console.log("sales response:", response);
+      testSalesItems: function(){
+        api.getSalesItems().then( function (response){
+          console.log("salesItems", response);
         });
 
       }
@@ -88,7 +86,9 @@
     watch: {
       reservation: function( val ){
         console.log("reservation changed @ folio", val.folio);
+        //this.folio = {};
         this.$store.dispatch('loadFolio', val.folio);
+        
       }
 
     }
