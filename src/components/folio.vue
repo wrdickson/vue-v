@@ -86,7 +86,9 @@
         });
     },
     data: function(){
-      return {}
+      return {
+        salesItems: {}
+      }
 
     },
     methods: {

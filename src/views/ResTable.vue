@@ -396,7 +396,13 @@
                 //by adding the data-res-id attribute, it will signal
                 //that this cell is reserved
                 document.getElementById(selector).setAttribute('data-res-id', res.id)
-                document.getElementById(selector).innerHTML = "<div data-res-id='" + res.id +"'class='reserved'>*</div>";
+                switch( res.status ){
+                  case "1":
+                    document.getElementById(selector).innerHTML = "<div data-res-id='" + res.id +"'class='reserved'>*</div>";
+                  case "2":
+                    document.getElementById(selector).innerHTML = "<div data-res-id='" + res.id +"'class='reserved_deposit'>*</div>";
+                }
+                //document.getElementById(selector).innerHTML = "<div data-res-id='" + res.id +"'class='reserved'>*</div>";
                 switch( iterateCount ){
                   case 0:
                     //handle the case where this is a one day reservation
@@ -508,6 +514,14 @@
 <style>
   
   .reserved{
+    background-color: yellow; 
+    color: yellow;
+    height: 100%;
+    width: 100%;
+    margin-top: -2px !important;
+    margin-bottom: -2px !important;
+  }
+  .reserved_deposit{
     background-color: green; 
     color: green;
     height: 100%;

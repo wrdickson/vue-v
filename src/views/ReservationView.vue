@@ -1,5 +1,11 @@
 <template>
   <div>
+    <ResActions
+      v-if="reservationIsLoaded"
+      :reservation="reservation"
+      :user="user"
+    >
+    </ResActions>
     <Customer
       :customer="customer"
       :showResetCustmer="showResetCustomer"
@@ -60,6 +66,7 @@
   import Reservation from './../components/reservation.vue'
   import ResNotes from './../components/resNotes.vue'
   import Folio from './../components/folio.vue'
+  import ResActions from './../components/resActions.vue'
   import api from './../api/api.js'
   import _ from 'lodash'
   export default {
@@ -67,7 +74,8 @@
       Customer,
       Reservation,
       ResNotes,
-      Folio
+      Folio,
+      ResActions
     },
     computed: {
         createButtonDisabled: {
@@ -80,6 +88,15 @@
               disabled  = false;  
             }
             return disabled            
+          }
+        },
+        reservationIsLoaded: {
+          get: function(){
+            if (this.reservation.id > 0){
+              return true;
+            } else {
+              return false;
+            }
           }
         }
     },
