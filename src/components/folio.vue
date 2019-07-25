@@ -28,8 +28,9 @@
         </span>
         
         <div>reservation.id: {{reservation.id}}</div>
-        <div>folio id: {{ folio.id }}</div>
+        <div>folio id: {{ reservation.folio }}</div>
         <v-btn @click="testSalesItems">testSalesItems</v-btn>
+        <v-btn @click="postDemoSale">postDemoSale</v-btn>
 
         
         <table class="salesTable">
@@ -53,31 +54,40 @@
               <td>{{ sale.username }}</td>
 
             </tr>
+            <tr>
+              <td>TOTAL CHARGES ==></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td>{{ salesTotal }}</td>
+              <td></td>           
+            </tr>
           </tbody>
         </table>
+
   </div>
 
 </template>
 
 <script>
   import api from './../api/api.js'
+  import _ from 'lodash'
   export default{
     computed: {
-      folio: {
+      salesTotal:{
         get: function(){
-          if( this.reservation.id > 0){
-            return this.reservation.folio_obj;
-          } else {
-            return {
-              sales: [],
-              payments: []
-            }
-          }
-
+          let salesTotal = 0;
+          const formatter = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 2
+          });
+          _.forEach(this.reservation.folio_obj.sales, function( sale ){
+            salesTotal = salesTotal + parseFloat(sale.total);
+          })
+          return formatter.format(salesTotal);
         }
-
       }
-     
     },
     created: function(){
       let self = this;
@@ -92,15 +102,37 @@
 
     },
     methods: {
+      postDemoSale: function(){
+        let self = this;
+        const demoSale = {
+          tax_type: "1",
+          sales_item: "3",
+          net: "24.00",
+          tax: "3.26",
+          total: "27.26",
+          sold_by: this.user.userId,          
+          shift: "1"
+        };
+        api.postSale( this.user, this.reservation.folio, demoSale ).then( function( response ){
+          console.log("sale response", response);
+          if(response.data.postSuccess == true){
+            //reload the reservation
+            self.$emit("reload-reservation");
+          }
+        });
+
+      },
       testSalesItems: function(){
         api.getSalesItems().then( function (response){
           console.log("salesItems", response);
+          
         });
       }
     },
     name: 'Folio',
     props: {
-      reservation: Object
+      reservation: Object,
+      user: Object
     }
   }
 </script>

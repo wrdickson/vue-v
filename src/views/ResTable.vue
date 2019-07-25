@@ -168,6 +168,7 @@
 </template>
 <script>
   import Moment from 'moment'
+  import api from './../api/api.js'
   import { extendMoment } from 'moment-range'
   import _ from 'lodash'
   const uuidv4 = require('uuid/v4')
@@ -398,11 +399,18 @@
                 document.getElementById(selector).setAttribute('data-res-id', res.id)
                 switch( res.status ){
                   case "1":
-                    document.getElementById(selector).innerHTML = "<div data-res-id='" + res.id +"'class='reserved'>*</div>";
+                    document.getElementById(selector).innerHTML = "<div data-res-id='" + res.id +"' class='reserved'>*</div>";
+                    break;
                   case "2":
-                    document.getElementById(selector).innerHTML = "<div data-res-id='" + res.id +"'class='reserved_deposit'>*</div>";
+                    document.getElementById(selector).innerHTML = "<div data-res-id='" + res.id +"' class='reserved_deposit'>*</div>";
+                    break; 
+                  case "3":
+                    document.getElementById(selector).innerHTML = "<div data-res-id='" + res.id +"' class='reserved_checkedin'>*</div>";
+                    break; 
+                  case "4":
+                    document.getElementById(selector).innerHTML = "<div data-res-id='" + res.id +"' class='reserved_checkedout'>*</div>";
+                    break;              
                 }
-                //document.getElementById(selector).innerHTML = "<div data-res-id='" + res.id +"'class='reserved'>*</div>";
                 switch( iterateCount ){
                   case 0:
                     //handle the case where this is a one day reservation
@@ -440,6 +448,7 @@
         }
       }, 
       resClick: function(space_id, date, event ){
+        let self = this;
         console.log("event.target", event.target);
         if(event.target.hasAttribute('data-res-id') == true){
           const resId = event.target.getAttribute('data-res-id');
@@ -449,7 +458,17 @@
           const checkin = event.target.getAttribute('data-date');
           const checkout = Moment( event.target.getAttribute('data-date') ).add(1,'days').format('YYYY-MM-DD');
           const spaceId = event.target.getAttribute('data-space-id');
-          this.$router.push( {name: 'createReservation', params: { checkin: checkin, checkout: checkout, spaceId: spaceId } });
+          //make sure that space is available . . . 
+          //what can happen is that this space is the parent of something that is NOT available
+          api.checkAvailability( 0, this.user, true, checkin, checkout, spaceId, 1, 1).then( function( response ){
+            console.log("avail:", response.data);
+            if(response.data.is_available == true){
+              self.$router.push( {name: 'createReservation', params: { checkin: checkin, checkout: checkout, spaceId: spaceId } });
+            } else {
+              alert("not available");
+            }
+          });
+
         }
       },        
       scrollRight: function(){
@@ -514,13 +533,32 @@
 <style>
   
   .reserved{
-    background-color: yellow; 
-    color: yellow;
+    background-color: rgb(145, 255, 0); 
+    color:rgb(145, 255, 0); 
     height: 100%;
     width: 100%;
     margin-top: -2px !important;
     margin-bottom: -2px !important;
   }
+
+  .reserved_checkedin{
+    background-color: blue; 
+    color: blue;
+    height: 100%;
+    width: 100%;
+    margin-top: -2px !important;
+    margin-bottom: -2px !important;
+  }
+
+  .reserved_checkedout{
+    background-color: rgb(131, 131, 224); 
+    color: rgb(131, 131, 224); 
+    height: 100%;
+    width: 100%;
+    margin-top: -2px !important;
+    margin-bottom: -2px !important;
+  }
+
   .reserved_deposit{
     background-color: green; 
     color: green;

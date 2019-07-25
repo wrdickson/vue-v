@@ -50,6 +50,29 @@ let api = {
     });
     return promise;    
   },
+  checkinReservation: ( user, resId ) => {
+    let promise  = axios({
+      data: {
+        user: user,
+        resId: resId
+      },
+      method: 'put',
+      url: '/api/reservation/checkin/' + resId
+    });
+    return promise;
+  },
+  checkoutReservation: (user, resId ) =>{
+    let promise  = axios({
+      data: {
+        user: user,
+        resId: resId
+      },
+      method: 'put',
+      url: '/api/reservation/checkout/' + resId
+    });
+    return promise;  
+
+  },
   createCustomer: ( user, customer ) => {
     let promise  = axios({
       data: {
@@ -164,6 +187,17 @@ let api = {
         startDate: startDate        
       },
       url: '/api/openShift/'
+    });
+    return request;
+  },
+  postSale: ( user, folioId, saleObj )=>{
+    const request = axios({
+      method: 'post',
+      data: {
+        user: user,
+        sale_obj: saleObj        
+      },
+      url: '/api/sale/' + folioId
     });
     return request;
   },

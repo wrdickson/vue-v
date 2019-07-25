@@ -2,6 +2,7 @@
   <div>
     <ResActions
       v-if="reservationIsLoaded"
+      @reload-reservation = "loadReservation"
       :reservation="reservation"
       :user="user"
     >
@@ -30,7 +31,10 @@
     >Update Reservation</v-btn>
 
     <Folio
+      v-if="reservationIsLoaded"
+      @reload-reservation="loadReservation"
       :reservation="reservation"
+      :user="user"
     />
 
     <ResNotes

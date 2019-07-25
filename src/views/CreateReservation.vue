@@ -116,8 +116,10 @@
         console.log("user", this.user);
         //TODO validate reservation
         let self = this;
+        
         api.addReservation( this.user, this.reservation).then( function( response ){
           console.log("createRes response", response);
+          console.log(response.data.stmt.queryString);
           if(response.data.execute == true){
             //now reload reservations
             self.$store.dispatch('getReservations');
@@ -129,7 +131,7 @@
         
       },
       customerSelect: function( customer ){
-        console.log("cust @ createReservationView", customer);
+        //console.log("cust @ createReservationView", customer);
         this.customer = customer;
         this.reservation.customer = customer.id;
       },
@@ -153,7 +155,7 @@
         return filtered;       
       },
       resetCustomer: function(){
-        console.log("resetCustomer fires");
+        //console.log("resetCustomer fires");
         this.customer = {
           id: '0',
           lastName: '',
@@ -171,10 +173,10 @@
         this.reservation.customer = '0';
       },
       updateAvailableSpaces: function(spaces){
-        console.log("update spaces",spaces);
+        //console.log("update spaces",spaces);
         this.availableSpaces = spaces;
         //update filteredSpaces
-        console.log("recalculating filteredSpaces");
+        //console.log("recalculating filteredSpaces");
         this.filteredSpaces = this.filterGroupsByDateAvailability();
 
       },
