@@ -47,6 +47,7 @@ export default new Vuex.Store({
     showLoader: false,
     spaces: {},
     spaceTypes: {},
+    taxTypes: [],
     testVal: {a:'test'},
     user: {
       userId: 0,
@@ -71,7 +72,6 @@ export default new Vuex.Store({
     getSelectedFolio: function(state){
       return state.selectedFolio;
     },
-
     getSelectedReservation: state => {
       return state.selectedReservation;
     },
@@ -86,6 +86,9 @@ export default new Vuex.Store({
     },
     getSpaceTypes: state => {
       return state.spaceTypes;
+    },
+    getTaxTypes: state => {
+      return state.taxTypes;
     },
     getUser: state => {
       return state.user
@@ -149,6 +152,9 @@ export default new Vuex.Store({
         end_date: '0000-00-00 00:00:00'
       };
       state.shift = closedShift;
+    },
+    setTaxTypes( state, taxTypes ){
+      state.taxTypes = taxTypes;
     },
     toggleSpaceShowSubspaces( state, spaceId ){
       //IMPORTANT!  note how the boolean is stored in the database
@@ -231,4 +237,4 @@ export default new Vuex.Store({
       });      
     }
   }
-})
+});

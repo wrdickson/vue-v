@@ -20,9 +20,24 @@ export default new Router({
       component: Home
     },
     {
+      path: '/adminPanel',
+      name: 'adminPanel',
+      component: () => import (/* webpackChunkName: "admin-panel" */ './views/AdminPanel.vue')
+    },
+    {
       path: '/createReservation/',
       name: 'createReservation',
-      component: () => import(/* webpackChunkName: "CreateReservation" */ './views/CreateReservation.vue')
+      component: () => import(/* webpackChunkName: "create-reservation" */ './views/CreateReservation.vue')
+    },
+    {
+      path: '/editSaleTypes/',
+      name: 'editSaleTypes',
+      component: () => import(/* webpackChunkName: "edit-sale-types" */ './components/editSaleTypes.vue')
+    },
+    {
+      path: '/editTaxTypes/',
+      name: 'editTaxTypes',
+      component: () => import(/* webpackChunkName: "edit-tax-types" */ './components/editTaxTypes.vue')
     },
     {
       path: '/login/',

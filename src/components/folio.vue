@@ -1,7 +1,7 @@
 <template>
   <div class="folioWrapper">
-    <h3>Folio</h3>
-        
+    <h2>Folio</h2>
+        <!--
         <span class="btnDiv">
             <v-menu 
               v-for="salesItem in salesItems" :key="salesItem.id" 
@@ -26,13 +26,16 @@
               </v-list>
             </v-menu>
         </span>
+        -->
         
+        <!--
         <div>reservation.id: {{reservation.id}}</div>
         <div>folio id: {{ reservation.folio }}</div>
         <v-btn @click="testSalesItems">testSalesItems</v-btn>
         <v-btn @click="postDemoSale">postDemoSale</v-btn>
+        -->
 
-        
+        <h3>Charges: </h3>
         <table class="salesTable">
           <thead>
             <tr>
@@ -44,26 +47,48 @@
               <th>By</th>
             </tr>
           </thead>
-          <tbody>
-            <tr v-for="sale in reservation.folio_obj.sales" v-bind:key="sale.id">
-              <td>{{ sale.sale_date }}</td>
-              <td>{{ sale.sales_item_title }}</td>
-              <td>{{ sale.net }}</td>
-              <td>{{ sale.tax }}</td>
-              <td>{{ sale.total }}</td>
-              <td>{{ sale.username }}</td>
+          
+            <tbody>
+              <tr v-for="sale in reservation.folio_obj.sales" v-bind:key="sale.id">
+                <td>{{ sale.sale_date }}</td>
+                <td>{{ sale.sales_item_title }}</td>
+                <td>{{ sale.net }}</td>
+                <td>{{ sale.tax }}</td>
+                <td>{{ sale.total }}</td>
+                <td>{{ sale.username }}</td>
 
-            </tr>
-            <tr>
-              <td>TOTAL CHARGES ==></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td>{{ salesTotal }}</td>
-              <td></td>           
-            </tr>
-          </tbody>
+              </tr>
+              <tr>
+                <td>TOTAL CHARGES ==></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>{{ salesTotal }}</td>
+                <td></td>           
+              </tr>
+            </tbody>
+          
         </table>
+        <v-layout>
+          <h3>Post Charge:</h3>
+        </v-layout>
+
+        <v-layout row wrap>
+          <!--sale type -->
+          <v-flex xs6>
+            <v-select
+              :items="currentSaleTypes"
+              label="Sale Type"
+              item-text="title"
+              item-value="id"
+              v-model="newSale"
+            >
+            </v-select>
+
+
+          </v-flex>
+
+        </v-layout>
 
   </div>
 
@@ -74,6 +99,17 @@
   import _ from 'lodash'
   export default{
     computed: {
+      currentSaleTypes: {
+        get: function(){
+          let currentSaleTypes = [];
+          _.forEach(this.saleTypes, function( saleType ){
+            if(saleType.is_current == "1"){
+              currentSaleTypes.push( saleType );
+            }
+          });
+          return currentSaleTypes;
+        }
+      },
       salesTotal:{
         get: function(){
           let salesTotal = 0;
@@ -94,10 +130,19 @@
         api.getSalesItems().then(function( response ){
           self.salesItems = response.data.items_by_group;
         });
+        api.getSaleTypes().then( function( response ){
+          self.saleTypes = response.data.sale_types;
+        });
     },
     data: function(){
       return {
-        salesItems: {}
+        newSale: {
+          saleType: "0",
+          
+
+        },
+        salesItems: {},
+        saleTypes: []
       }
 
     },
@@ -158,6 +203,13 @@
 
 .salesTable {
   border-collapse: collapse;
+  width: 100%;
+  background-color: rgb(18, 39, 2);
+}
+
+.salesTableInner {
+  max-height: 120px;
+  
 }
 .salesTable th {
   border: 2px solid green;

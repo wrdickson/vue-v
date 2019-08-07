@@ -70,7 +70,21 @@
               <v-list-tile-title >ResTable</v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
-        </div> 
+        </div>
+
+        <!-- from here down, only visible to logged userw permission > 7 --> 
+        <div v-if="user.permission > 7">
+          <v-list-tile v-ripple to="/adminPanel">
+            <v-list-tile-action>
+              <v-icon>view_comfy</v-icon>
+            </v-list-tile-action>
+            <v-list-tile-content>
+              <v-list-tile-title >Admin Panel</v-list-tile-title>
+            </v-list-tile-content>
+          </v-list-tile>
+
+
+         </div>        
 
       </v-list>
       <div>
@@ -119,6 +133,12 @@
       });
       api.getReservations().then( function(response){
         self.$store.commit('setReservations', response.data);
+      });
+      api.getSaleTypes().then( function(response){
+        console.log("sale types", response );
+      });
+      api.getTaxTypes().then( function( response ){
+        self.$store.commit( 'setTaxTypes', response.data.tax_types );
       });
     },
     computed: {
@@ -187,6 +207,5 @@
 </script>
 
 <style>
-
 
 </style>

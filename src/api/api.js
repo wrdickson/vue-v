@@ -1,6 +1,17 @@
 import axios from 'axios'
 
 let api = {
+  addNewSaleType: ( user, newSaleType ) => {
+    let promise  = axios({
+      data: {
+        user: user,
+        newSaleType: newSaleType
+      },
+      method: 'post',
+      url: '/api/sale-types/'
+    });
+    return promise;
+  },
   addReservation: (user, reservation)=> {
     let promise  = axios({
       data: {
@@ -20,6 +31,17 @@ let api = {
       },
       method: 'post',
       url: '/api/reservationNotes/' + reservationId
+    });
+    return promise;
+  },
+  addTaxType: (user, taxType ) => {
+    let promise  = axios({
+      data: {
+        user: user,
+        tax_type: taxType
+      },
+      method: 'post',
+      url: '/api/tax-types/'
     });
     return promise;
   },
@@ -107,24 +129,28 @@ let api = {
   getReservations: ()=>{
     let request = axios({
       method: 'get',
-      url: '/api/reservations/',
-      //data: user
+      url: '/api/reservations/'
       });
      return request
   },
   getSalesItems: ()=>{
     let request = axios({
       method: 'get',
-      url: '/api/sales-items/',
-      //data: user
+      url: '/api/sales-items/'
+      });
+     return request
+  },
+  getSaleTypes: ()=>{
+    let request = axios({
+      method: 'get',
+      url: '/api/sale-types/'
       });
      return request
   },
   getSpaces: ()=>{
     return axios({
       method: 'get',
-      url: '/api/spaces/',
-      //data: user
+      url: '/api/spaces/'
     });
   },
   getSpaceData: ()=>{
@@ -140,14 +166,18 @@ let api = {
     return axios({
       method: 'get',
       url: '/api/selectGroups/',
-      //data: user
     });    
   },
   getSpaceTypes: ()=>{
     return axios({
       method: 'get',
       url: '/api/types/',
-      //data: user
+    });
+  },
+  getTaxTypes: ()=>{
+    return axios({
+      method: 'get',
+      url: '/api/tax-types/',
     });
   },
   getUserShift: ( userId ) =>{
@@ -226,6 +256,28 @@ let api = {
       data: {
         user: user,
         reservation: reservation
+      },
+      method: 'put'
+    });
+    return request;
+  },
+  updateSaleType: ( user, saleType ) => {
+    let request = axios({
+      url: '/api/sale-types/' + saleType.id,
+      data: {
+        user: user,
+        saleType: saleType
+      },
+      method: 'put'
+    });
+    return request;
+  },
+  updateTaxType: (user, taxType ) => {
+    let request = axios({
+      url: '/api/tax-types/' + taxType.id,
+      data: {
+        user: user,
+        tax_type: taxType
       },
       method: 'put'
     });

@@ -21,6 +21,8 @@ module.exports = {
   //baseUrl: '/vue-v/' //to deploy to b at mytrail.org/vue-v/
   
   //??use this when building to serve from localhost with apache
+
+  // build says "baseUrl is deprecated, use 'publicPath' instead
   //baseUrl: '/vue-v/dist/' 
 
 };
