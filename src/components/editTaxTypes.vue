@@ -5,10 +5,10 @@
     <div class="text-center">
       <v-snackbar
         v-model="snackbar"
-        timeout=3000
+        :timeout=3000
         color="amber darken-4"
-        top=true
-        multi-line=true
+        top
+        multi-line
       >
         {{ snackbarText }}
         <v-btn
@@ -232,7 +232,7 @@ export default{
     },
     selectRecord: function(e){
       let recordId = e.target.parentNode.getAttribute('data-id');
-      //set the computed clone of this record
+      //set the clone of this record
       this.recordClone = _.cloneDeep( _.find(this.taxTypes, function(o){
         return o.id == recordId;
       }));

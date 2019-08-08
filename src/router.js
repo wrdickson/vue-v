@@ -30,6 +30,11 @@ export default new Router({
       component: () => import(/* webpackChunkName: "create-reservation" */ './views/CreateReservation.vue')
     },
     {
+      path: '/editSaleItems/',
+      name: 'EditSaleItems',
+      component: () => import(/* webpackChunkNanme: "edit-sale-items" */ './components/editSaleItems.vue')
+    },
+    {
       path: '/editSaleTypes/',
       name: 'editSaleTypes',
       component: () => import(/* webpackChunkName: "edit-sale-types" */ './components/editSaleTypes.vue')

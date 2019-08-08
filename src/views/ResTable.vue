@@ -581,11 +581,7 @@
     padding-left: 4px;
     padding-right: 4px;
   }
-  
-  
-  .indent0{
-    
-  }
+ 
   .indent1{
     padding-left: 16px !important;
   }

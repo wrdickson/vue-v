@@ -24,7 +24,7 @@ let api = {
     return promise;
   },
   addReservationNote: ( user, reservationId, note ) => {
-    let promise  = axios({
+    let promise = axios({
       data: {
         user: user,
         note: note
@@ -34,6 +34,17 @@ let api = {
     });
     return promise;
   },
+  addSalesItem: ( user, saleItem ) => {
+    let promise = axios({
+      data: {
+        user: user,
+        sales_item: saleItem
+      },
+      method: 'post',
+      url: '/api/sales-items/'
+    });
+    return promise;
+  }, 
   addTaxType: (user, taxType ) => {
     let promise  = axios({
       data: {
@@ -130,6 +141,13 @@ let api = {
     let request = axios({
       method: 'get',
       url: '/api/reservations/'
+      });
+     return request
+  },
+  getSalesGroups: () => {
+    let request = axios({
+      method: 'get',
+      url: '/api/sales-groups/'
       });
      return request
   },
@@ -256,6 +274,17 @@ let api = {
       data: {
         user: user,
         reservation: reservation
+      },
+      method: 'put'
+    });
+    return request;
+  },
+  updateSalesItem: ( user, salesItem ) => {
+    let request = axios({
+      url: '/api/sales-items/' + salesItem.id,
+      data: {
+        user: user,
+        sales_item: salesItem
       },
       method: 'put'
     });

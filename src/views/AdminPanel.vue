@@ -11,6 +11,10 @@
       color="info"
       to="/editTaxTypes/"
     >Tax Types</v-btn>
+    <v-btn
+      color="info"
+      to="/editSaleItems/"
+    >Sale Items</v-btn>
   </div>
 
 </template>
