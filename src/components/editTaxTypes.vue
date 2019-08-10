@@ -53,7 +53,6 @@
       </v-flex>
       <!-- edit dialog -->
       <v-dialog
-        fullscreen
         v-model="editDialog"
       >
         <v-card>
@@ -106,7 +105,6 @@
       </v-dialog>
       <!-- add dialog -->
       <v-dialog
-        fullscreen
         v-model="addDialog"
       >
         <v-card>

@@ -79,6 +79,10 @@ export default{
             key: response.data.login.user_key
           };
           this.$store.commit('setUser', obj)
+          //now look for an open shift
+          api.getUserShift( response.data.login.id ).then( function( response ){
+            console.log("openShift@login", response)
+          });
         } else {
           //set session . . .
           sessionStorage.setItem("username", "Guest");

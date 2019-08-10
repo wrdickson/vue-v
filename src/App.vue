@@ -23,6 +23,12 @@
           color="success">
         Close Shift
         </v-btn>
+        <v-btn
+          v-if="shift.id > 1" 
+          @click="shiftReport" 
+          color="success">
+        Shift Report
+        </v-btn>
       </div>
       <v-list dense>
         <!--
@@ -114,7 +120,6 @@
 <script>
   import api from './api/api.js'
   import Spin from './components/spin.vue' 
-  import moment from 'moment'
   export default {
     components: {
       Spin
@@ -171,12 +176,19 @@
             drawer: null,
             
             resDatePicker: false,
-            resStart: '2019-05-21'
+            resStart: '2019-05-21',
          }
     },
     methods: {
       closeShift: function(){
-        console.log("closeShift()");
+        let self = this;
+        alert("When built out, user will have to complete shift termination procedures here.");
+        api.closeShift( this.user, this.shift ).then( function( response ){
+          console.log("closeShift", response )
+          if( response.data.execute == true ){
+            self.$store.commit('setShiftClosed')
+          }
+        })
       },
       logoff: function(){
         //logoff
@@ -186,17 +198,24 @@
         api.logoff(this.user.userId, this.user.key).then( (response ) => {
             console.log("logoff response:", response);
         });
+        //clear sessionStorage
+        sessionStorage.clear()
         //regardless, nav home
-        this.$router.push('home');
+        this.$router.push('/home');
       },
       openShift: function(){
         let self = this;
-        let startDate = moment();
-        api.openShift(this.user, startDate).then( function(response){
+        //let startDate = moment().format("YYYY MM DD;
+        api.openShift(this.user).then( function(response){
           console.log("response");
           self.$store.commit('setShift', response.data.shift);
         });
 
+      },
+      shiftReport: function(){
+        //navigate to shift report
+        let shiftId = this.shift.id;
+        this.$router.push( { name: 'shiftReport', params: { shiftId: shiftId } });
       }
     },
     name: 'App',

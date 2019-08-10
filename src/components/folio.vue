@@ -1,43 +1,17 @@
 <template>
   <div class="folioWrapper">
-    <h2>Folio</h2>
-        <!--
-        <span class="btnDiv">
-            <v-menu 
-              v-for="salesItem in salesItems" :key="salesItem.id" 
-              offset-y >
-              <template v-slot:activator="{ on }">
-                <v-btn
-                  class="tButton"
-                  color="primary"
-                  dark
-                  v-on="on"
-                >
-                  {{ salesItem.sales_item_title}}
-                </v-btn>
-              </template>
-              <v-list>
-                <v-list-tile
-                  v-for="item in salesItem.groups"
-                  :key="item.id"
-                >
-                  <v-list-tile-title>{{ item.sales_item_title }}</v-list-tile-title>
-                </v-list-tile>
-              </v-list>
-            </v-menu>
-        </span>
-        -->
-        
-        <!--
-        <div>reservation.id: {{reservation.id}}</div>
-        <div>folio id: {{ reservation.folio }}</div>
-        <v-btn @click="testSalesItems">testSalesItems</v-btn>
-        <v-btn @click="postDemoSale">postDemoSale</v-btn>
-        -->
+    <Payment
+      v-if="reservation.id > 0"
+      :reservation="reservation"
+      :user="user"
+      :shift="shift"
+      @payment-saved="reloadReservation"
+      :paymentTotal="paymentTotal"
 
+    ></Payment>
+    <h2>Folio</h2>
         <h3>Charges: </h3>
         <table class="salesTable">
-          <thead>
             <tr>
               <th>Date</th> 
               <th>Item</th>
@@ -46,30 +20,24 @@
               <th>Total</th>
               <th>By</th>
             </tr>
-          </thead>
-          
-            <tbody>
-              <tr v-for="sale in reservation.folio_obj.sales" v-bind:key="sale.id">
-                <td>{{ sale.sale_date }}</td>
-                <td>{{ sale.sales_item_title }}</td>
-                <td>{{ sale.net }}</td>
-                <td>{{ sale.tax }}</td>
-                <td>{{ sale.total }}</td>
-                <td>{{ sale.username }}</td>
-
-              </tr>
-              <tr>
-                <td>TOTAL CHARGES ==></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td>{{ salesTotal }}</td>
-                <td></td>           
-              </tr>
-            </tbody>
-          
+            <tr v-for="sale in reservation.folio_obj.sales" v-bind:key="sale.id">
+              <td>{{ sale.sale_date }}</td>
+              <td>{{ sale.sales_item_title }}</td>
+              <td>{{ sale.net }}</td>
+              <td>{{ sale.tax }}</td>
+              <td>{{ sale.total }}</td>
+              <td>{{ sale.username }}</td>
+            </tr>
+            <tr>
+              <td>TOTAL CHARGES ==></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td>{{ salesTotal }}</td>
+              <td></td>           
+            </tr>
         </table>
-        <v-layout row wrap class="postSale">
+        <v-layout v-if="folioIsOpen" row wrap class="postSale">
           <v-flex xs12 sm12 md12 lg12 xl12>
             <h3>Post Charge:</h3>
           </v-flex>
@@ -137,20 +105,18 @@
 </template>
 
 <script>
+  import Payment from './../components/payment.vue'
   import api from './../api/api.js'
   import _ from 'lodash'
   export default{
+    components: {
+      Payment
+    },
     computed: {
-      currentSaleTypes: {
-        get: function(){
-          let currentSaleTypes = [];
-          _.forEach(this.saleTypes, function( saleType ){
-            if(saleType.is_current == "1"){
-              currentSaleTypes.push( saleType );
-            }
-          });
-          return currentSaleTypes;
-        }
+      folioIsOpen: function(){
+        if( this.$store.getters.getShift.id > 1 ){
+          return true
+        } else { return false }
       },
       formattedPrice: {
          get: function(){
@@ -162,6 +128,17 @@
       },
       netPrice: function(){
         return parseFloat(this.newSale.price) * parseFloat(this.newSale.quantity)
+      },
+      paymentTotal: {
+        get: function(){
+          let paymentTotal = 0;
+
+          _.forEach(this.reservation.folio_obj.payments, function( payment ){
+            paymentTotal = paymentTotal + parseFloat(payment.amount);
+          })
+          return paymentTotal;
+          
+        }
       },
       salesTotal:{
         get: function(){
@@ -175,6 +152,7 @@
             salesTotal = salesTotal + parseFloat(sale.total);
           })
           return formatter.format(salesTotal);
+          
         }
       },
       totalSale: function(){
@@ -193,7 +171,6 @@
       api.getSalesItems().then(function( response ){
         self.salesItems = response.data.sales_items;
       });
-
     },
     data: function(){
       return {
@@ -208,42 +185,22 @@
         quantityItems: [1,2,3,4,5,6,7,8,9,10],
         salesItems: [],
         saleTypes: [],
-        selectedSaleItem: {}
+        selectedSaleItem: {},
+        shift: this.$store.getters.getShift
       }
-
     },
     methods: {
-      postDemoSale: function(){
-        let self = this;
-        const demoSale = {
-          tax_type: "1",
-          sales_item: "3",
-          net: "24.00",
-          tax: "3.26",
-          total: "27.26",
-          sold_by: this.user.userId,          
-          shift: "1"
-        };
-        api.postSale( this.user, this.reservation.folio, demoSale ).then( function( response ){
-          console.log("sale response", response);
-          if(response.data.postSuccess == true){
-            //reload the reservation
-            self.$emit("reload-reservation");
-          }
-        });
 
-      },
       postSale(){
         this.newSale.net = this.netPrice.toString()
         this.newSale.tax = this.totalTax.toString()
         this.newSale.total = this.totalSale.toString()
         this.newSale.quantity = this.newSale.quantity.toString()
         this.newSale.sold_by = this.user.userId
-
-
+        //  CRITICAL TO GET SHIFT ID IN
+        this.newSale.shift = this.shift.id
         //TEMP DEBUG
         this.newSale.notes = []
-        this.newSale.shift = '1';
 
 
         console.log("newSale", this.newSale) 
@@ -251,11 +208,14 @@
         api.postSale( this.user, this.reservation.folio, this.newSale ).then( function( response ){
           console.log("sale response", response);
           if(response.data.postSuccess == true){
+
             //reload the reservation
-            self.$emit("reload-reservation");
+            self.$emit( "reload-reservation" );
           }
         });          
-
+      },
+      reloadReservation: function(){
+        this.$emit( "reload-reservation" );
       },
       resetSale: function(){
         this.newSale = {
@@ -272,14 +232,10 @@
         return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
       },
       salesItemSelect: function(){
-        console.log("newSale:", this.newSale);
-        console.log("items", this.salesItems );
         let self = this;
         this.selectedSaleItem = _.find( this.salesItems, function( o ){
           return o.id == self.newSale.sales_item
         })
-        
-        console.log("ssi", this.selectedSaleItem);
         if(this.selectedSaleItem.is_fixed_price == true){
           this.newSale.price = this.selectedSaleItem.price
           this.newSale.tax_type = this.selectedSaleItem.tax_type
@@ -293,13 +249,6 @@
           this.newSale.tax_rate = this.selectedSaleItem.tax_rate 
           this.priceIsReadOnly = false;       
         }
-        
-      },
-      testSalesItems: function(){
-        api.getSalesItems().then( function (response){
-          console.log("salesItems", response);
-          
-        });
       }
     },
     name: 'Folio',
@@ -353,5 +302,6 @@
   border: 1px solid green;
   padding: 3px;
 }
+
 
 </style>

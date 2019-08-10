@@ -106,6 +106,17 @@ let api = {
     return promise;  
 
   },
+  closeShift: (user, shift) => {
+    let promise  = axios({
+      data: {
+        user: user,
+        shift: shift
+      },
+      method: 'put',
+      url: '/api/shifts/close/' + shift.id
+    });
+    return promise
+  },
   createCustomer: ( user, customer ) => {
     let promise  = axios({
       data: {
@@ -128,7 +139,14 @@ let api = {
      return request
   }, 
   getInitialData: () => {
-    
+   
+  },
+  getPaymentTypes: () => {
+    let request = axios({
+      method: 'get',
+      url: '/api/payment-types/',
+      });
+     return request  
   },
   getReservation: (id)=>{
     let request = axios({
@@ -186,6 +204,16 @@ let api = {
       url: '/api/selectGroups/',
     });    
   },
+  getShiftData: ( user, shiftId ) => {
+    const request = axios({
+      method: 'post',
+      data: {
+        user: user
+      },
+      url: '/api/shift-data/' + shiftId
+    });
+    return request;
+  },
   getSpaceTypes: ()=>{
     return axios({
       method: 'get',
@@ -238,14 +266,25 @@ let api = {
     });
     return request;
   },
-  postSale: ( user, folioId, saleObj )=>{
+  postPayment: (user, paymentObj) => {
+    const request = axios({
+      method: 'post',
+      data: {
+        user: user,
+        payment_obj: paymentObj       
+      },
+      url: '/api/payment/'
+    });
+    return request;    
+  },
+  postSale: ( user, folio, saleObj ) =>{
     const request = axios({
       method: 'post',
       data: {
         user: user,
         sale_obj: saleObj        
       },
-      url: '/api/sale/' + folioId
+      url: '/api/sale/' + folio
     });
     return request;
   },

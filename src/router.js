@@ -65,5 +65,11 @@ export default new Router({
       name: 'resTable',
       component: () => import(/* webpackChunkName: "ResTable1" */ './views/ResTable.vue')
     },
+    {
+      path: '/shift-report/:shiftId',
+      name: 'shiftReport',
+      component: () => import(/* webpackChunkName: "shift-report" */ './views/ShiftReport.vue'),
+      props: true
+    }
   ]
 })
